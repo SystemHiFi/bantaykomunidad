@@ -1,0 +1,3144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barangay CAYANGA BantayKOmunidad - Command Portal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- LeafletJS Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        /* ==========================================================================
+           GREEN COMMUNITY COLOR THEME & CORE SYSTEM LAYOUT
+           ========================================================================== */
+        :root {
+            --primary-green: #198754;      /* Forest Green */
+            --primary-dark-green: #146c43; /* Dark Emerald */
+            --accent-green: #20c997;       /* Soft Mint */
+            --bg-light: #f3f7f4;           /* Soft Sage Gray tint */
+            --emergency-red: #dc3545;      /* Critical Alert Red */
+            --pending-amber: #f59e0b;     /* Warning Amber */
+            --vulnerable-blue: #0d6efd;   /* Vulnerable Blue */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg-light);
+            color: #2b2b2b;
+        }
+
+        h2, h4 {
+            color: var(--primary-dark-green);
+            font-weight: 600;
+        }
+
+        h2 { margin-bottom: 25px; }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.06);
+            background: #ffffff;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark-green);
+            border-color: var(--primary-dark-green);
+        }
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        /* ==========================================================================
+        LOGIN SCREEN WITH GRADIENT OVERLAY & BACKGROUND IMAGE
+        ========================================================================== */
+                #loginPage {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: 
+                linear-gradient(135deg, rgba(20, 108, 67, 0.85), rgba(32, 201, 151, 0.75)),
+                url('cayanga_bh.png'); /* Change 'bg.jpg' to your image filename */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 440px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,.2);
+            text-align: center;
+        }
+
+        .brand-title {
+            color: var(--primary-dark-green);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        #loginErrorMessage {
+            display: none;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+
+        .password-wrap { position: relative; }
+        .password-wrap .form-control { padding-right: 48px; }
+        .password-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 48px;
+            border: 0;
+            background: transparent;
+            color: #6c757d;
+            z-index: 5;
+            cursor: pointer;
+        }
+        .password-toggle:hover, .password-toggle:focus-visible { color: var(--primary-green); outline: none; }
+
+        /* ==========================================================================
+           DASHBOARD FRAMEWORK & TOP AUDIT NAVBAR
+           ========================================================================== */
+        #dashboard {
+            display: none;
+        }
+
+        .duty-bar {
+            background: #ffffff;
+            border-bottom: 2px solid #e2e8e4;
+            padding: 12px 30px;
+            margin-left: 260px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .officer-badge {
+            background: #e8f5e9;
+            color: var(--primary-dark-green);
+            border: 1px solid #c8e6c9;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 260px;
+            height: 100vh;
+            background: var(--primary-dark-green);
+            color: white;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            text-align: center;
+            padding: 25px 15px;
+            color: #fff;
+            border-bottom: 1px solid rgba(255,255,255,.15);
+            margin: 0;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all .3s;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar li:hover, .sidebar li.active {
+            background: #0f5132;
+            border-left: 4px solid var(--accent-green);
+            padding-left: 30px;
+        }
+
+        .content {
+            margin-left: 260px;
+            padding: 30px 40px;
+            min-height: calc(100vh - 60px);
+        }
+
+        .page {
+            display: none;
+        }
+
+        /* ==========================================================================
+           LEAFLET MAP & COLOR-CODED MARKERS
+           ========================================================================== */
+        #leafletMap {
+            height: 520px;
+            border-radius: 12px;
+            border: 2px solid #cce0d2;
+            background: #0f172a;
+            z-index: 1;
+        }
+
+        .custom-house-icon {
+            background: transparent;
+            border: none;
+            text-align: center;
+        }
+
+        .custom-house-icon i {
+            font-size: 26px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            transition: all 0.3s ease;
+        }
+
+        .custom-house-icon.icon-verified i { color: var(--primary-green) !important; }
+        .custom-house-icon.icon-vulnerable i { color: var(--vulnerable-blue) !important; }
+        .custom-house-icon.icon-pending i { color: var(--pending-amber) !important; }
+
+        .custom-brgy-hall-marker {
+            background: var(--primary-dark-green);
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+            font-size: 18px;
+        }
+
+        .custom-house-icon.alert-active i {
+            color: var(--emergency-red) !important;
+            animation: housePulse 1.2s infinite;
+        }
+
+        @keyframes housePulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(220,53,69,0.7)); }
+            50% { transform: scale(1.35); filter: drop-shadow(0 0 15px rgba(220,53,69,0.9)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(220,53,69,0.7)); }
+        }
+
+        .map-control-bar {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e1e8e3;
+        }
+
+        .map-legend-box {
+            background: #f8faf9;
+            border: 1px solid #dbe6df;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 12px;
+        }
+
+        .diff-container { font-family: 'Courier New', Courier, monospace; font-size: 13px; }
+        .diff-old { background-color: #f8d7da; color: #842029; padding: 8px 12px; border-radius: 6px; border-left: 4px solid #dc3545; }
+        .diff-new { background-color: #d1e7dd; color: #0f5132; padding: 8px 12px; border-radius: 6px; border-left: 4px solid #198754; }
+
+        .id-card-preview { display: block; width: 100%; max-width: 260px; height: auto; aspect-ratio: 1 / 1; margin-left: auto; margin-right: auto; object-fit: cover; border-radius: 10px; border: 2px dashed #a3cfbb; background: #e8f5e9; }
+
+        .emergency-banner {
+            background: var(--emergency-red);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: none;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .official-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,.05);
+            transition: transform .3s ease;
+            margin-bottom: 20px;
+        }
+
+        .official-card:hover { transform: translateY(-8px); }
+
+        .official-card img {
+            width: 110px;
+            height: 110px;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 4px solid var(--primary-green);
+        }
+
+        @media(max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .duty-bar { margin-left: 0; flex-direction: column; gap: 10px; text-align: center; }
+            .content { margin-left: 0; padding: 20px; }
+            .sidebar li { justify-content: center; }
+            .sidebar-brand { padding: 15px; }
+        }
+
+        .btn-group { gap: 10px; flex-wrap: wrap; }
+        .btn-group > .btn,
+        .btn-group > .btn:not(:first-child),
+        .btn-group > .btn:not(:last-child),
+        .btn-group > :not(.btn-check) + .btn {
+            border-radius: 8px !important;
+            margin-left: 0 !important;
+        }
+
+        .bk-toast-stack { position: fixed; top: 16px; right: 16px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; width: min(380px, calc(100vw - 32px)); pointer-events: none; }
+        .bk-toast {
+            pointer-events: auto; display: flex; align-items: flex-start; gap: 12px;
+            background: #fff; border: 1px solid #e3ece6; border-left: 5px solid var(--bk-c, #198754); border-radius: 12px;
+            padding: 12px 12px 12px 14px; box-shadow: 0 10px 30px rgba(15, 60, 40, .18);
+            animation: bkToastIn .22s ease-out;
+        }
+        .bk-toast > i { color: var(--bk-c, #198754); font-size: 18px; margin-top: 2px; }
+        .bk-toast .bk-toast-text { flex: 1; font-size: .9rem; line-height: 1.4; color: #1f2a24; }
+        .bk-toast .bk-toast-close { border: 0; background: none; color: #85928a; font-size: 16px; line-height: 1; padding: 2px 4px; cursor: pointer; }
+        .bk-toast.success { --bk-c: #198754; }
+        .bk-toast.danger  { --bk-c: #dc3545; }
+        .bk-toast.warning { --bk-c: #dc3545; }
+        .bk-toast.info    { --bk-c: #0d6efd; }
+        .bk-toast.leaving { opacity: 0; transform: translateY(-6px); transition: opacity .2s, transform .2s; }
+        @keyframes bkToastIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+        #confirmModal .modal-content { border: 0; border-radius: 16px; box-shadow: 0 24px 60px rgba(10, 50, 30, .3); }
+        .confirm-icon { width: 52px; height: 52px; border-radius: 50%; background: #e8f5ee; color: #198754; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 14px; }
+        .confirm-icon.is-danger { background: #fde9eb; color: #dc3545; }
+    
+    #alertContainer:empty::before { content: "No community alerts yet. Use \"Broadcast New Alert\" to post one."; display:block; text-align:center; color:#6c757d; padding:2rem 0; }
+    #feedContainer:empty::before { content: "No feed posts yet. Use \"Create Post\" to add one."; display:block; text-align:center; color:#6c757d; padding:2rem 0; }
+    #aidContainer:empty::before { content: "No aid listings yet. Use \"Post Request or Offer\" to add one."; display:block; text-align:center; color:#6c757d; padding:2rem 0; width:100%; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SECTION -->
+<div id="loginPage">
+    <div class="login-box">
+        <img src="BantayKounidad_Logo.png" alt="Logo" style="width: 80px; height: 80px; aspect-ratio: 1 / 1; object-fit: contain;" />
+        
+        <h3 class="brand-title mb-2"><span style="color: #2E7D32;">BANTAY</span><span style="color: #D32F2F;">KO</span><span style="color: #2E7D32;">MUNIDAD</span></h3>
+        <p class="text-muted small mb-4">Brgy. Cayanga, San Fabian, Pangasinan - Command Portal</p>
+
+        <div id="loginErrorMessage" class="alert alert-danger py-2 mb-3 text-start align-items-center" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i>
+            <span id="loginErrorText">Invalid Credentials!</span>
+        </div>
+        
+        <div class="form-floating mb-3">
+            <select id="loginAccountSelect" class="form-select">
+                <option value="officer_juan">Hon. Juan Dela Cruz (Brgy. Captain)</option>
+                <option value="officer_maria">Maria Santos (Brgy. Secretary)</option>
+                <option value="officer_carlos">Carlos Reyes (Desk Officer-in-Charge)</option>
+            </select>
+            <label for="loginAccountSelect">Select Logging Officer</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="text" id="username" class="form-control" placeholder="Username">
+            <label for="username">Username</label>
+        </div>
+        
+        <div class="form-floating mb-3 password-wrap">
+            <input type="password" id="password" class="form-control" placeholder="Password" autocomplete="current-password">
+            <label for="password">Password</label>
+            <button type="button" class="password-toggle" id="passwordToggle" onclick="togglePassword()" aria-label="Show password" aria-pressed="false" title="Show password">
+                <i class="fa-solid fa-eye" id="passwordToggleIcon"></i>
+            </button>
+        </div>
+
+        <button class="btn btn-primary w-100 py-2 shadow-sm" onclick="login()">
+            <i class="fa-solid fa-right-to-bracket me-2"></i>Sign In Duty Shift
+        </button>
+    </div>
+</div>
+
+<!-- MAIN DASHBOARD SYSTEM -->
+<div id="dashboard">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="BantayKounidad_Logo.png" alt="Logo" style="width: 80px; height: 80px; aspect-ratio: 1 / 1; object-fit: contain;" />
+            
+            <div style="background-color: #ffffff; display: inline-block; padding: 0; border-radius: 8px; font-family: 'Arial Black', sans-serif; font-size: 18px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <span style="color: #2E7D32;">BANTAY</span><span style="color: #D32F2F;">KO</span><span style="color: #2E7D32;">MUNIDAD</span>
+            </div>
+        </div>
+        <ul>
+            <li id="nav-home" onclick="showSection('home')"><i class="fa-solid fa-house"></i> Home</li>
+            <li id="nav-map" onclick="showSection('map')"><i class="fa-solid fa-map-location-dot"></i> Location Map</li>
+            <li id="nav-alerts" onclick="showSection('alerts')"><i class="fa-solid fa-bullhorn"></i> Community Alerts</li>
+            <li id="nav-feed" onclick="showSection('feed')"><i class="fa-solid fa-newspaper"></i> Brgy. Feed</li>
+            <li id="nav-aid" onclick="showSection('aid')"><i class="fa-solid fa-handshake"></i> Mutual Aid Board</li>
+            <li id="nav-vetting" onclick="showSection('vetting')"><i class="fa-solid fa-user-check"></i> Resident Verification</li>
+            <li id="nav-logs" onclick="showSection('logs')"><i class="fa-solid fa-list-check"></i> Audit & Serial Logs</li>
+            <li id="nav-dbtools" onclick="showSection('dbtools')"><i class="fa-solid fa-database"></i> Database Tools</li>
+            <li class="mt-4 text-warning" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> End Officer Shift</li>
+        </ul>
+    </div>
+
+    <div class="duty-bar">
+        <div>
+            <span class="text-muted small">Active Station Monitoring Matrix — Brgy. Cayanga, San Fabian, Pangasinan</span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <button id="arduinoConnectBtn" class="btn btn-sm btn-success shadow-sm" onclick="connectArduino()">
+                <i class="fa-solid fa-microchip me-1"></i> Connect Arduino
+            </button>
+            <span id="arduinoStatusBadge" class="badge bg-secondary"><i class="fa-solid fa-plug-circle-xmark me-1"></i> Arduino Offline</span>
+            <span class="officer-badge shadow-sm">
+                <i class="fa-solid fa-user-shield me-2 text-success"></i>
+                Duty Officer In-Charge: <strong id="activeDutyOfficerDisplay" class="ms-1">Not Assigned</strong>
+            </span>
+            <small id="loginTimeDisplay" class="text-muted font-monospace"></small>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- GLOBAL REAL-TIME EMERGENCY ALERT BANNER -->
+        <div id="globalEmergencyBanner" class="emergency-banner shadow">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="text-white mb-1"><i class="fa-solid fa-triangle-exclamation me-2"></i> CRITICAL HARDWARE EMERGENCY ALARM DETECTED</h4>
+                    <span id="bannerDetails">Household Name: N/A | Distance from Brgy. Hall: 0m</span>
+                </div>
+                <button class="btn btn-light btn-sm fw-bold text-danger px-3 shadow-sm" onclick="clearActiveEmergency()">
+                    <i class="fa-solid fa-check-double me-1"></i> Acknowledge Selected Emergency
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. HOME -->
+        <div id="home" class="page">
+            <h2>Barangay Strategic Administration</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="official-card">
+                        <img src="nopfp.jpeg" alt="Captain">
+                        <h5>Hon. Juan Dela Cruz</h5>
+                        <p class="text-muted mb-0">Barangay Captain</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="official-card">
+                        <img src="nopfp.jpeg" alt="Secretary">
+                        <h5>Maria Santos</h5>
+                        <p class="text-muted mb-0">Barangay Secretary</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="official-card">
+                        <img src="nopfp.jpeg" alt="Treasurer">
+                        <h5>Agustin Reyes</h5>
+                        <p class="text-muted mb-0">Desk Officer-in-Charge</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h4 class="mb-3"><i class="fa-solid fa-phone-volume text-success me-2"></i>Emergency Hotline Matrix</h4>
+                    <div class="row text-center">
+                        <div class="col-6 col-md-3 border-end mb-3 mb-md-0"><h5>911</h5><small class="text-muted">National Emergency</small></div>
+                        <div class="col-6 col-md-3 border-end mb-3 mb-md-0"><h5>(075) 511-2433</h5><small class="text-muted">Brgy. Cayanga Operations Desk</small></div>
+                        <div class="col-6 col-md-3 border-end"><h5>(075) 511-2222</h5><small class="text-muted">San Fabian Police Station</small></div>
+                        <div class="col-6 col-md-3"><h5>(075) 511-3333</h5><small class="text-muted">San Fabian Fire Station</small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. LOCATION MAP -->
+        <div id="map" class="page">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h2>Location Map — Barangay Cayanga Interactive Map</h2>
+                
+                <button class="btn btn-outline-success btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#mapHelpModal">
+                    <i class="fa-solid fa-circle-question me-1"></i> Map Help & Legend Guide
+                </button>
+            </div>
+            
+            <div class="map-control-bar mb-3">
+                <div class="row g-3 align-items-center">
+                    <div class="col-lg-6 col-md-7">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-success"><i class="fa-solid fa-magnifying-glass-location"></i></span>
+                            <input type="text" id="mapSmartSearchInput" list="mapSearchDatalist" class="form-control" placeholder="Search House #, Head Name (e.g., Datuin, Reyes)..." onkeyup="handleMapSearchKey(event)">
+                            <datalist id="mapSearchDatalist">
+                                <option value="Datuin Household"></option>
+                                <option value="Juan Datuin"></option>
+                                <option value="Dela Cruz Household"></option>
+                                <option value="Maria Dela Cruz"></option>
+                                <option value="Reyes Household"></option>
+                                <option value="Carlos Reyes"></option>
+                            </datalist>
+                            <button class="btn btn-primary" onclick="executeMapSearch()">
+                                <i class="fa-solid fa-location-arrow me-1"></i> Focus
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="resetMapControls()" title="Reset Map View & Filters">
+                                <i class="fa-solid fa-xmark"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-5">
+                        <div class="d-flex gap-2 justify-content-lg-end align-items-center flex-wrap">
+                            <span class="badge bg-dark py-2 px-3 fw-bold" id="mapFilteredCount">
+                                Showing 3 of 3 Households
+                            </span>
+                            <button class="btn btn-sm btn-outline-primary" onclick="recenterMap()" title="Recenter to Brgy. Hall">
+                                <i class="fa-solid fa-crosshairs me-1"></i> Recenter
+                            </button>
+                            <select class="form-select form-select-sm" id="mapMarkerFilter" style="width: auto;" onchange="filterMapMarkers(this.value)">
+                                <option value="all">All Household Pins</option>
+                                <option value="verified">Verified Residents Only</option>
+                                <option value="vulnerable">Vulnerable (Senior / PWD)</option>
+                                <option value="pending">Pending Verification</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="card p-3">
+                        <div id="leafletMap"></div>
+                        <div class="map-legend-box mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <span class="fw-bold text-secondary"><i class="fa-solid fa-map-pin me-1"></i> Map Pin Legend:</span>
+                            <span><i class="fa-solid fa-building-columns text-success me-1"></i> Brgy. Hall</span>
+                            <span><i class="fa-solid fa-house-chimney me-1" style="color:#198754;"></i> Verified Standard</span>
+                            <span><i class="fa-solid fa-house-chimney me-1" style="color:#0d6efd;"></i> Senior / PWD</span>
+                            <span><i class="fa-solid fa-house-chimney me-1" style="color:#f59e0b;"></i> Pending Review</span>
+                            <span><i class="fa-solid fa-house-chimney text-danger me-1"></i> Emergency SOS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card p-4 mb-3">
+                        <h4 class="mb-2"><i class="fa-solid fa-house-user text-success me-2"></i>Household Profile</h4>
+                        <hr class="mt-1 mb-3">
+                        <div id="houseInfoPanel">
+                            <p class="text-muted small">Click any house marker on the map or use the Smart Search bar above to inspect family profile.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="liveAlertStatusCard" class="card p-4 border-start border-success border-4">
+                        <h5>Current Alert State</h5>
+                        <div id="liveAlertStatusBox" class="p-3 bg-light rounded text-center fw-bold text-success mt-2">
+                            <i class="fa-solid fa-shield-halved me-1"></i> Normal: All Households Secured
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. COMMUNITY ALERTS -->
+        <div id="alerts" class="page">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h2>Community Alerts</h2>
+                
+                <button class="btn btn-outline-success btn-sm shadow-sm me-auto ms-3" data-bs-toggle="modal" data-bs-target="#alertHelpModal">
+                    <i class="fa-solid fa-circle-question me-1"></i> Alert Protocols Guide
+                </button>
+
+                <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#addAlertModal">
+                    <i class="fa-solid fa-bullhorn me-1"></i> Broadcast New Alert
+                </button>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6 col-12 mb-2">
+                    <div class="card p-3 border-start border-danger border-4 d-flex flex-row align-items-center shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation fs-2 text-danger me-3"></i>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-danger" id="activeAlertCountDisplay">0</h3>
+                            <small class="text-muted">Active High-Priority Alerts</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 mb-2">
+                    <div class="card p-3 border-start border-success border-4 d-flex flex-row align-items-center shadow-sm">
+                        <i class="fa-solid fa-check-circle fs-2 text-success me-3"></i>
+                        <div>
+                            <h3 class="fw-bold mb-0 text-success" id="resolvedAlertCountDisplay">0</h3>
+                            <small class="text-muted">Resolved Incidents Today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-3 mb-4 bg-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="btn-group" role="group" id="alertStatusFilter">
+                        <button type="button" class="btn btn-outline-secondary active" onclick="filterAlerts('all', this)">All</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="filterAlerts('active', this)">Active Alerts</button>
+                        <button type="button" class="btn btn-outline-success" onclick="filterAlerts('resolved', this)">Resolved</button>
+                    </div>
+
+                    <div class="input-group input-group-sm" style="max-width: 260px;">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" id="alertSearchInput" class="form-control" placeholder="Search incidents or targets..." onkeyup="searchAlerts()">
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small fw-bold text-muted mb-0"><i class="fa-solid fa-filter me-1"></i>Severity:</label>
+                        <select class="form-select form-select-sm" id="alertSeverityFilter" style="width: auto;" onchange="filterAlertsBySeverity(this.value)">
+                            <option value="all">All Severities</option>
+                            <option value="danger">Critical Red</option>
+                            <option value="warning">Moderate Amber</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="alertContainer"></div>
+        </div>
+
+        <!-- 4. BRGY. FEED -->
+        <div id="feed" class="page">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h2>Brgy. Feed</h2>
+                
+                <button class="btn btn-outline-success btn-sm shadow-sm me-auto ms-3" data-bs-toggle="modal" data-bs-target="#feedHelpModal">
+                    <i class="fa-solid fa-circle-question me-1"></i> Feed Protocols Guide
+                </button>
+
+                <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#addFeedModal">
+                    <i class="fa-solid fa-plus me-1"></i> Create Post
+                </button>
+            </div>
+
+            <div class="card p-3 mb-4 bg-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="btn-group" role="group" id="feedStatusFilter">
+                        <button type="button" class="btn btn-outline-secondary active" onclick="filterFeed('all', this)">All</button>
+                        <button type="button" class="btn btn-outline-warning" onclick="filterFeed('pending', this)">Pending</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="filterFeed('ongoing', this)">Ongoing</button>
+                        <button type="button" class="btn btn-outline-success" onclick="filterFeed('completed', this)">Completed</button>
+                    </div>
+
+                    <div class="input-group input-group-sm" style="max-width: 260px;">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" id="feedSearchInput" class="form-control" placeholder="Search posts or events..." onkeyup="applyFeedFilters()">
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small fw-bold text-muted mb-0"><i class="fa-solid fa-filter me-1"></i>Category:</label>
+                        <select class="form-select form-select-sm" id="feedCategoryFilter" style="width: auto;" onchange="applyFeedFilters()">
+                            <option value="all">All Categories</option>
+                            <option value="governance">Governance</option>
+                            <option value="cleanup">Cleanup</option>
+                            <option value="health">Health</option>
+                            <option value="livelihood">Livelihood</option>
+                            <option value="sports_culture">Sports &amp; Culture</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedContainer"></div>
+        </div>
+
+        <!-- 5. MUTUAL AID BOARD -->
+        <div id="aid" class="page">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h2>Mutual Aid Board</h2>
+                
+                <button class="btn btn-outline-success btn-sm shadow-sm me-auto ms-3" data-bs-toggle="modal" data-bs-target="#aidHelpModal">
+                    <i class="fa-solid fa-circle-question me-1"></i> Aid Protocols Guide
+                </button>
+
+                <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addAidModal">
+                    <i class="fa-solid fa-handshake me-1"></i> Post Request or Offer
+                </button>
+            </div>
+
+            <div class="card p-3 mb-4 bg-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="btn-group" role="group" id="aidTypeFilter">
+                        <button type="button" class="btn btn-outline-secondary active" onclick="filterAid('all', this)">All</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="filterAid('offer', this)">Offers</button>
+                        <button type="button" class="btn btn-outline-warning" onclick="filterAid('request', this)">Requests</button>
+                        <button type="button" class="btn btn-outline-success" onclick="filterAid('fulfilled', this)">Fulfilled</button>
+                    </div>
+
+                    <div class="input-group input-group-sm" style="max-width: 260px;">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" id="aidSearchInput" class="form-control" placeholder="Search aid items..." onkeyup="searchAidListings()">
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small fw-bold text-muted mb-0"><i class="fa-solid fa-filter me-1"></i>Category:</label>
+                        <select class="form-select form-select-sm" id="aidCategoryFilter" style="width: auto;" onchange="filterAidByCategory(this.value)">
+                            <option value="all">All Categories</option>
+                            <option value="Food & Water">Food & Water</option>
+                            <option value="Medical">Medical Supplies</option>
+                            <option value="Shelter & Clothing">Shelter & Clothing</option>
+                            <option value="Equipment & Tools">Equipment & Tools</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="aidContainer" class="row"></div>
+        </div>
+
+        <!-- 6. RESIDENT VERIFICATION MODULE -->
+        <div id="vetting" class="page">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h2>Resident Verification & Identity Authentication</h2>
+                
+                <button class="btn btn-outline-success btn-sm shadow-sm me-auto ms-3" data-bs-toggle="modal" data-bs-target="#vettingHelpModal">
+                    <i class="fa-solid fa-circle-question me-1"></i> Verification Protocol Guide
+                </button>
+
+                <button class="btn btn-outline-primary btn-sm" onclick="renderVettingQueue()">
+                    <i class="fa-solid fa-rotate me-1"></i> Refresh Queue
+                </button>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3 col-6">
+                    <div class="card p-3 border-start border-warning border-4 text-center">
+                        <h3 class="mb-0 fw-bold text-warning" id="statPendingVetting">3</h3>
+                        <small class="text-muted">Pending Reviews</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card p-3 border-start border-success border-4 text-center">
+                        <h3 class="mb-0 fw-bold text-success" id="statApprovedVetting">148</h3>
+                        <small class="text-muted">Verified Residents</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card p-3 border-start border-danger border-4 text-center">
+                        <h3 class="mb-0 fw-bold text-danger" id="statRejectedVetting">3</h3>
+                        <small class="text-muted">Rejected Requests</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card p-3 border-start border-info border-4 text-center">
+                        <h3 class="mb-0 fw-bold text-info" id="statAuthRate">98.0%</h3>
+                        <small class="text-muted">Authentication Rate</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-3 mb-4 bg-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="input-group input-group-sm" style="max-width: 380px;">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" id="vettingSearchInput" class="form-control" placeholder="Search by resident name or Purok..." onkeyup="filterVettingQueue()">
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small fw-bold text-muted mb-0">Status:</label>
+                        <select class="form-select form-select-sm" id="vettingStatusFilter" style="width: auto;" onchange="filterVettingQueue()">
+                            <option value="all" selected>All Submissions</option>
+                            <option value="Pending">Pending Verification</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Approved">Verified / Approved</option>
+                            <option value="Rejected">Rejected / Declined</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-0 shadow-sm overflow-hidden mb-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Resident Name</th>
+                                <th>Submitted Date</th>
+                                <th>Purok / Zone</th>
+                                <th>Submitted Documents</th>
+                                <th>Status</th>
+                                <th class="text-end">Verification Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vettingTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATABASE TOOLS -->
+        <div id="dbtools" class="page">
+            <h2 class="mb-4"><i class="fa-solid fa-database me-2"></i>Database Tools</h2>
+            <div class="card p-4 mb-3">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span id="bkToolsDot" style="width:10px;height:10px;border-radius:50%;background:#adb5bd;display:inline-block;"></span>
+                    <strong id="bkToolsStatus">Checking SQL database...</strong>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="bkDb.exportBackup()"><i class="fa-solid fa-download me-1"></i> Backup (download file)</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('bkDbImportFile').click()"><i class="fa-solid fa-upload me-1"></i> Restore from backup</button>
+                    <button type="button" class="btn btn-danger btn-sm ms-auto" onclick="bkDb.resetAll()"><i class="fa-solid fa-trash me-1"></i> Clear EVERYTHING</button>
+                </div>
+                <input type="file" id="bkDbImportFile" accept=".json,application/json" style="display:none" onchange="bkDb.importBackup(this.files[0]); this.value='';">
+            </div>
+            <div class="card p-4">
+                <h5 class="mb-3">Saved records, table by table</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead><tr><th>What it holds</th><th>SQL table</th><th class="text-end">Records</th><th class="text-end">Clear</th></tr></thead>
+                        <tbody id="bkToolsBody"></tbody>
+                    </table>
+                </div>
+                <p class="small text-muted mt-3 mb-0">Clearing empties the data only. The SQL tables stay in the database, ready for new records.</p>
+            </div>
+        </div>
+
+        <!-- 7. AUDIT & SERIAL LOGS MODULE -->
+        <div id="logs" class="page">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h2>System Accountability Audit & Serial Logs</h2>
+                
+                <button class="btn btn-outline-success btn-sm shadow-sm me-auto ms-3" data-bs-toggle="modal" data-bs-target="#logsHelpModal">
+                    <i class="fa-solid fa-circle-question me-1"></i> Audit Trails Guide
+                </button>
+
+                <button class="btn btn-outline-success btn-sm" onclick="exportAuditCSV()">
+                    <i class="fa-solid fa-file-csv me-1"></i> Export Logs to CSV
+                </button>
+            </div>
+
+            <ul class="nav nav-tabs mb-4" id="logTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active font-weight-bold" id="audit-tab" data-bs-toggle="tab" data-bs-target="#auditTabPane" type="button" role="tab"><i class="fa-solid fa-clock-rotate-left me-1"></i> System Audit Trail</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link font-weight-bold" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serialTabPane" type="button" role="tab"><i class="fa-solid fa-barcode me-1"></i> Serial & Certificate Tracker</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link font-weight-bold" id="terminal-tab" data-bs-toggle="tab" data-bs-target="#terminalTabPane" type="button" role="tab"><i class="fa-solid fa-terminal me-1"></i> Live Hardware Terminal</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="logTabContent">
+                <div class="tab-pane fade show active" id="auditTabPane" role="tabpanel">
+                    <div class="card p-3 mb-3 bg-white shadow-sm">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light"><i class="fa-solid fa-filter"></i></span>
+                                    <input type="text" id="auditSearchInput" class="form-control" placeholder="Search actor, action, or module..." onkeyup="filterAuditLogs()">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select form-select-sm" id="auditActionFilter" onchange="filterAuditLogs()">
+                                    <option value="all">All Action Types</option>
+                                    <option value="LOGIN">LOGIN / SHIFT</option>
+                                    <option value="VERIFY">VERIFY / REJECT</option>
+                                    <option value="CREATE">CREATE / BROADCAST</option>
+                                    <option value="EMERGENCY">EMERGENCY ALARM</option>
+                                    <option value="HARDWARE">ARDUINO HARDWARE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <small class="text-muted font-monospace">Real-time Immutable Ledger Enabled</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-0 shadow-sm overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>User / Actor</th>
+                                        <th>Action Type</th>
+                                        <th>Target Module</th>
+                                        <th>IP / Device</th>
+                                        <th class="text-end">Data Diff / Inspection</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTrailTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="serialTabPane" role="tabpanel">
+                    <div class="card p-0 shadow-sm overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Serial / Cert ID</th>
+                                        <th>Document / Item Type</th>
+                                        <th>Assigned Resident</th>
+                                        <th>Issue Date</th>
+                                        <th>Issuer</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="serialTrackerTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="terminalTabPane" role="tabpanel">
+                    <div class="card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0"><i class="fa-solid fa-satellite-dish text-success me-2"></i>Real-Time Hardware & Shift Socket Stream</h6>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-success" onclick="connectArduino()"><i class="fa-solid fa-plug me-1"></i> Connect Hardware</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="document.getElementById('serialLogStream').innerHTML=''">Clear Terminal</button>
+                            </div>
+                        </div>
+                        <div id="serialLogStream" class="bg-dark text-success font-monospace p-3 rounded" style="height: 380px; overflow-y: auto; font-size: 13px;">
+                            [AUDIT SYSTEM INITIALIZED]: Listening for shift logs and incoming hardware triggers...<br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- DYNAMIC MODALS -->
+<div class="modal fade" id="mapHelpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-circle-question me-2"></i>Map Controls & Pin Guide</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold mb-2">Map Marker Color Legend</h6>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-house-chimney text-success fs-5"></i>
+                        <div><strong>Green Pin:</strong> Standard Verified Resident Household</div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-house-chimney text-primary fs-5"></i>
+                        <div><strong>Blue Pin:</strong> Vulnerable Household (Senior Citizen / PWD)</div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-house-chimney text-warning fs-5"></i>
+                        <div><strong>Amber Pin:</strong> Pending Identity Verification</div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-house-chimney text-danger fs-5"></i>
+                        <div><strong>Pulsing Red Pin:</strong> Active Hardware S.O.S Emergency Trigger</div>
+                    </li>
+                </ul>
+
+                <h6 class="fw-bold mb-2">Quick Navigation Shortcuts</h6>
+                <p class="small text-muted mb-1">• Use the <strong>Search Bar</strong> to auto-focus directly on a resident's home.</p>
+                <p class="small text-muted mb-1">• Toggle satellite vs street maps using Leaflet's top-right layer icon.</p>
+                <p class="small text-muted mb-0">• Click <strong>Recenter</strong> to quickly jump back to Barangay Cayanga Hall.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="alertHelpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-circle-question me-2"></i>Community Alerts Protocol Guide</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold mb-2">Severity Designations</h6>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-danger fs-5"></i>
+                        <div><strong><i class="fa-solid fa-circle-exclamation text-danger me-1"></i> Critical Red:</strong> Immediate threat to life or property (Floods, Fire).</div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-warning fs-5"></i>
+                        <div><strong><i class="fa-solid fa-triangle-exclamation text-warning me-1"></i> Moderate Amber:</strong> Cautionary advisory, monitoring required (Weather updates, roadblocks).</div>
+                    </li>
+                </ul>
+
+                <h6 class="fw-bold mb-2">Resolving Procedures</h6>
+                <p class="small text-muted mb-1">• Only authorized Desk Officers can set an alert to <strong>Resolved</strong> once the incident site is declared safe.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="feedHelpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-circle-question me-2"></i>Brgy. Feed Protocol Guide</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold mb-2">Feed Post Types</h6>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-hourglass-half text-warning fs-5"></i>
+                        <div><strong>Pending Event:</strong> Activities scheduled for the future.</div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-circle-play text-primary fs-5"></i>
+                        <div><strong>Ongoing Event:</strong> Activities currently in progress.</div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-success fs-5"></i>
+                        <div><strong>Completed Event:</strong> Concluded programs or announcements.</div>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="aidHelpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-circle-question me-2"></i>Mutual Aid Protocol Guide</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold mb-2">Handling Aid Requests</h6>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-hand-holding-heart text-success fs-5"></i>
+                        <div><strong>Supply Offer:</strong> Resident is voluntarily offering excess goods (food, water).</div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-hands-praying text-danger fs-5"></i>
+                        <div><strong>Assistance Request:</strong> Resident requires urgent resources.</div>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="vettingHelpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-circle-question me-2"></i>Verification Protocol Guide</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold mb-2">Vetting Approvals</h6>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item">Ensure the ID image matches the resident's data form.</li>
+                    <li class="list-group-item">Confirm address proofs reflect the correct Purok mapping.</li>
+                    <li class="list-group-item text-danger">If rejecting an application, you must supply a rejection reason via the dropdown for transparency.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="logsHelpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-circle-question me-2"></i>System Audit Protocol Guide</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted mb-2">The <strong>Audit Trail</strong> securely logs all actions performed on the portal by duty officers to ensure administrative accountability.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="inspectResidentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-passport me-2 text-warning"></i>Resident Identity Verification Inspection</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="inspectModalBody">
+            </div>
+            <div class="modal-footer bg-light justify-content-between">
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="rejectionReasonSelect" style="width: 220px;">
+                        <option value="" selected disabled hidden>Select Reject Reason</option>
+                        <option value="Blurry/Unreadable ID Document">Blurry ID Document</option>
+                        <option value="Address Discrepancy in Purok">Address Mismatch</option>
+                        <option value="Expired Government ID">Expired Government ID</option>
+                    </select>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="processVettingAction('Rejected')">
+                        <i class="fa-solid fa-circle-xmark me-1"></i> Reject
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-warning btn-sm me-2" onclick="processVettingAction('Request Info')">
+                        <i class="fa-solid fa-circle-info me-1"></i> Request Info
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm px-3" onclick="processVettingAction('Approved')">
+                        <i class="fa-solid fa-circle-check me-1"></i> Approve & Verify
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="diffViewerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-code-compare me-2 text-info"></i>Audit Data Modification Snapshot ("Diff")</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="diffModalContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Snapshot</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addFeedModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-newspaper me-2 text-success"></i>Publish Brgy. Feed Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Post Title</label>
+                    <input type="text" id="feedTitle" class="form-control" placeholder="e.g., Medical Mission & Health Drive">
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Post Category</label>
+                        <select id="feedCategory" class="form-select">
+                            <option value="" selected disabled hidden>Select Category</option>
+                            <option value="governance">Governance</option>
+                            <option value="cleanup">Cleanup</option>
+                            <option value="health">Health</option>
+                            <option value="livelihood">Livelihood</option>
+                            <option value="sports_culture">Sports &amp; Culture</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Initial Event Status</label>
+                        <select id="feedStatus" class="form-select">
+                            <option value="" selected disabled hidden>Select Initial Event Status</option>
+                            <option value="pending">Pending Event</option>
+                            <option value="ongoing">Ongoing Event</option>
+                            <option value="completed">Completed Event</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Schedule / Date Details</label>
+                    <input type="text" id="feedTime" class="form-control" placeholder="e.g., Scheduled: Today, 2:00 PM">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Post Description</label>
+                    <textarea id="feedDesc" class="form-control" rows="3" placeholder="Provide post details..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="submitFeedPost()">Publish Post</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addAidModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-handshake me-2"></i>Post Mutual Aid Listing</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Listing Type</label>
+                        <select id="aidType" class="form-select">
+                            <option value="" selected disabled hidden>Select Listing Type</option>
+                            <option value="offer">Free Supply / Help Offer</option>
+                            <option value="request">Assistance Request</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Resource Category</label>
+                        <select id="aidCategory" class="form-select">
+                            <option value="" selected disabled hidden>Select Resource Category</option>
+                            <option value="Food & Water">Food & Water</option>
+                            <option value="Medical">Medical Supplies</option>
+                            <option value="Shelter & Clothing">Shelter & Clothing</option>
+                            <option value="Equipment & Tools">Equipment & Tools</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Target Zone / Sector</label>
+                        <select id="aidTargetPurok" class="form-select">
+                            <option value="" selected disabled hidden>Select Target Zone / Sector</option>
+                            <option value="Purok 1 Sector">Purok 1 Sector</option>
+                            <option value="Purok 2 Mid-Field">Purok 2 Mid-Field</option>
+                            <option value="Purok 3 River Sector">Purok 3 River Sector</option>
+                            <option value="Barangay Wide">Barangay Wide</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Resident Contact Reference</label>
+                        <input type="text" id="aidContact" class="form-control" placeholder="e.g., Juan Santos (0917-123-4567)">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Listing Title / Item Name</label>
+                    <input type="text" id="aidTitle" class="form-control" placeholder="e.g., Portable Solar Lamps / Extra Canned Goods">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Description & Collection Context</label>
+                    <textarea id="aidDesc" class="form-control" rows="3" placeholder="Provide instructions for pick up, delivery, or specific requirements..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitAidListing()">Publish Aid Listing</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addAlertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-bullhorn me-2"></i>Broadcast Community Warning Alert</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Alert Title / Topic</label>
+                    <input type="text" id="alertTitleInput" class="form-control" placeholder="e.g., Heavy Road Obstruction in Purok 1" required>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Severity Classification</label>
+                        <select id="alertType" class="form-select">
+                            <option value="" selected disabled hidden>Select Severity Classification</option>
+                            <option value="danger">Critical Red Threat Alert</option>
+                            <option value="warning">Moderate Amber Notice</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Target Zone / Sector</label>
+                        <select id="alertTargetPurok" class="form-select">
+                            <option value="" selected disabled hidden>Select Target Zone / Sector</option>
+                            <option value="Barangay Wide">Barangay Wide (All Puroks)</option>
+                            <option value="Purok 1 Core Sector">Purok 1 Core Sector</option>
+                            <option value="Purok 2 Mid-Field Sector">Purok 2 Mid-Field Sector</option>
+                            <option value="Purok 3 River Sector">Purok 3 River Sector</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Alert Message / Instructions</label>
+                    <textarea id="alertText" class="form-control" rows="3" placeholder="Provide actionable emergency instructions for residents..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="submitAlertBroadcast()">Broadcast Alert Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center pt-4 pb-1 px-4">
+                <div id="confirmIcon" class="confirm-icon"><i class="fa-solid fa-circle-question"></i></div>
+                <h5 id="confirmTitle" class="mb-2">Are you sure?</h5>
+                <p id="confirmMessage" class="text-muted small mb-0"></p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4 pt-3">
+                <button type="button" id="confirmCancelBtn" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmActionBtn" class="btn btn-success px-4">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    /* ==========================================================================
+       UTILITY & ESCAPING FUNCTIONS
+       ========================================================================== */
+    function notify(message, type) {
+        const text = String(message);
+        if (!type) {
+            if (/^(error|failed|please|web serial)/i.test(text)) type = "danger";
+            else if (/successfully|deployed|published|updated/i.test(text)) type = "success";
+            else type = "info";
+        }
+        const icons = { success: "fa-circle-check", danger: "fa-circle-exclamation", warning: "fa-triangle-exclamation", info: "fa-circle-info" };
+        let stack = document.getElementById("bkToastStack");
+        if (!stack) {
+            stack = document.createElement("div");
+            stack.id = "bkToastStack";
+            stack.className = "bk-toast-stack";
+            stack.setAttribute("aria-live", "polite");
+            document.body.appendChild(stack);
+        }
+        const toast = document.createElement("div");
+        toast.className = `bk-toast ${type}`;
+        toast.setAttribute("role", type === "danger" ? "alert" : "status");
+        toast.innerHTML = `<i class="fa-solid ${icons[type]}"></i><div class="bk-toast-text"></div><button type="button" class="bk-toast-close" aria-label="Dismiss">&times;</button>`;
+        toast.querySelector(".bk-toast-text").textContent = text;
+        const dismiss = () => { toast.classList.add("leaving"); setTimeout(() => toast.remove(), 220); };
+        toast.querySelector(".bk-toast-close").addEventListener("click", dismiss);
+        stack.appendChild(toast);
+        setTimeout(dismiss, type === "danger" || type === "warning" ? 7000 : 4500);
+    }
+
+    function bkConfirm(message, opts = {}) {
+        return new Promise(resolve => {
+            const { title = "Are you sure?", confirmText = "Confirm", cancelText = "Cancel", danger = false } = opts;
+            const modalEl = document.getElementById("confirmModal");
+            document.getElementById("confirmTitle").textContent = title;
+            document.getElementById("confirmMessage").textContent = message;
+            const okBtn = document.getElementById("confirmActionBtn");
+            const cancelBtn = document.getElementById("confirmCancelBtn");
+            okBtn.textContent = confirmText;
+            cancelBtn.textContent = cancelText;
+            okBtn.className = `btn px-4 ${danger ? "btn-danger" : "btn-success"}`;
+            const icon = document.getElementById("confirmIcon");
+            icon.className = `confirm-icon ${danger ? "is-danger" : ""}`;
+            icon.innerHTML = `<i class="fa-solid ${danger ? "fa-triangle-exclamation" : "fa-circle-question"}"></i>`;
+
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            let result = false;
+            const onOk = () => { result = true; modal.hide(); };
+            const onHidden = () => {
+                okBtn.removeEventListener("click", onOk);
+                modalEl.removeEventListener("hidden.bs.modal", onHidden);
+                resolve(result);
+            };
+            okBtn.addEventListener("click", onOk);
+            modalEl.addEventListener("hidden.bs.modal", onHidden);
+            modalEl.addEventListener("shown.bs.modal", () => okBtn.focus(), { once: true });
+            modal.show();
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    /* ==========================================================================
+       AUTHENTICATION & DUTY OFFICER ACCOUNTABILITY SYSTEM
+       ========================================================================== */
+    const officialAccounts = {
+        officer_juan: { name: "Hon. Juan Dela Cruz (Brgy. Captain)", role: "Captain" },
+        officer_maria: { name: "Maria Santos (Brgy. Secretary)", role: "Secretary" },
+        officer_carlos: { name: "Carlos Reyes (Desk Officer-in-Charge)", role: "Desk Officer" }
+    };
+
+    let activeDutyOfficer = null;
+    let activeEmergencyIds = new Set();
+    let selectedEmergencyId = null;
+
+    function login() {
+        const user = document.getElementById("username").value.trim();
+        const pass = document.getElementById("password").value.trim();
+        const selectedOfficerKey = document.getElementById("loginAccountSelect").value;
+        const errorBox = document.getElementById("loginErrorMessage");
+        const errorText = document.getElementById("loginErrorText");
+
+        if (user !== "official" && pass !== "admin123") {
+            errorText.innerText = "Incorrect Username and Password!";
+            errorBox.style.display = "flex";
+            return;
+        } else if (user !== "official") {
+            errorText.innerText = "Incorrect Username! Please check your ID.";
+            errorBox.style.display = "flex";
+            return;
+        } else if (pass !== "admin123") {
+            errorText.innerText = "Incorrect Password! Access Denied.";
+            errorBox.style.display = "flex";
+            return;
+        }
+
+        errorBox.style.display = "none";
+        activeDutyOfficer = officialAccounts[selectedOfficerKey];
+
+        document.getElementById("activeDutyOfficerDisplay").innerText = activeDutyOfficer.name;
+        
+        const loginTime = new Date().toLocaleString();
+        document.getElementById("loginTimeDisplay").innerText = `Shift Started: ${loginTime}`;
+
+        addAuditLog("LOGIN", "Authentication Portal", `Duty shift initiated by ${activeDutyOfficer.name}`);
+
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        showSection("home");
+    }
+
+    function togglePassword(forceHide) {
+        const input = document.getElementById("password");
+        const icon = document.getElementById("passwordToggleIcon");
+        const btn = document.getElementById("passwordToggle");
+        const show = forceHide ? false : input.type === "password";
+        input.type = show ? "text" : "password";
+        icon.className = show ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+        btn.setAttribute("aria-pressed", show);
+        btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+        btn.title = show ? "Hide password" : "Show password";
+    }
+
+    async function logout() {
+        if (await bkConfirm(`End active shift for ${activeDutyOfficer ? activeDutyOfficer.name : 'Officer'}?`, { title: "End officer shift", confirmText: "End shift", danger: true })) {
+            addAuditLog("LOGOUT", "Authentication Portal", `Duty shift closed by ${activeDutyOfficer ? activeDutyOfficer.name : 'Officer'}`);
+            document.getElementById("dashboard").style.display = "none";
+            document.getElementById("loginPage").style.display = "flex";
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            togglePassword(true);
+            document.getElementById("loginErrorMessage").style.display = "none";
+            activeDutyOfficer = null;
+        }
+    }
+
+    document.addEventListener("keydown", function(e) {
+        const loginPage = document.getElementById("loginPage");
+        if (e.key === "Enter" && loginPage && window.getComputedStyle(loginPage).display !== "none") {
+            login();
+        }
+    });
+
+    /* ==========================================================================
+       ROUTING NAVIGATION VIEW ENGINE & LEAFLET MAP HANDLING
+       ========================================================================== */
+    function showSection(pageId) {
+        document.querySelectorAll(".page").forEach(item => item.style.display = "none");
+        document.querySelectorAll(".sidebar li").forEach(item => item.classList.remove("active"));
+        
+        const targetPage = document.getElementById(pageId);
+        const targetNav = document.getElementById(`nav-${pageId}`);
+        
+        if (targetPage) targetPage.style.display = "block";
+        if (targetNav) targetNav.classList.add("active");
+
+        if (pageId === 'map') {
+            initLiveMap();
+            setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+        } else if (pageId === 'vetting') {
+            renderVettingQueue();
+        } else if (pageId === 'logs') {
+            renderAuditTable();
+            renderSerialTable();
+        }
+    }
+
+    /* ==========================================================================
+       LOCATION MAP MODULE
+       ========================================================================== */
+    let map;
+    let streetTileLayer, satelliteTileLayer;
+    let barangayBorderPolygon;
+    let leafletMarkers = {};
+    let activeMapFilter = "all";
+    
+    const barangayCoordinates = [
+        [16.1206201, 120.4012951], [16.1140411, 120.3958374], [16.1147993, 120.3941711],
+        [16.111884,  120.3939201], [16.1117698, 120.3945753], [16.1117576, 120.3951315],
+        [16.1116778, 120.395535],  [16.1113776, 120.3963274], [16.1153097, 120.4060417], [16.1206201, 120.4012951]
+    ];
+
+    const BRGY_HALL_COORDS = [16.113292767794288, 120.39789579923443];
+
+    const prototypeHouseholders = {
+        1: { 
+            name: "Datuin Household (House 1)", distance: "40 meters", location: "Purok 1 Core Sector", 
+            coords: [16.1135, 120.3982], head: "Juan Datuin", count: 4, verified: true, vulnerable: false,
+            phone: "0917-111-2233", members: "Juan Datuin, Pacita Datuin, Jarrell Datuin, Emily Datuin", notes: "Infant present in household." 
+        },
+        2: { 
+            name: "Dela Cruz Household (House 2)", distance: "78 meters", location: "Purok 2 Mid-Field Sector", 
+            coords: [16.1138, 120.3974], head: "Maria Dela Cruz", count: 5, verified: true, vulnerable: true,
+            phone: "0917-555-0192", members: "Maria Dela Cruz, Pedro Dela Cruz, Teresa Dela Cruz, Juanito Dela Cruz, Sofia Dela Cruz", notes: "Wheelchair access profile (PWD)." 
+        },
+        3: { 
+            name: "Reyes Household (House 3)", distance: "440 meters", location: "Purok 3 Outer Perimeter Sector", 
+            coords: [16.115645, 120.401200], head: "Carlos Reyes", count: 3, verified: false, vulnerable: true,
+            phone: "0918-999-4455", members: "Carlos Reyes, Glenda Reyes, Mark Reyes", notes: "Senior Citizen residing near Cayanga River." 
+        }
+    };
+
+    function initLiveMap() {
+        if (map) return;
+
+        map = L.map('leafletMap', { center: BRGY_HALL_COORDS, zoom: 17, minZoom: 14, maxZoom: 19 });
+
+        streetTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        satelliteTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 18,
+            attribution: 'Tiles © Esri'
+        });
+
+        barangayBorderPolygon = L.polygon(barangayCoordinates, { color: '#22c55e', weight: 3, fillOpacity: 0.05 }).addTo(map);
+
+        const baseMaps = {
+            '<i class="fa-solid fa-map"></i> Street Map': streetTileLayer,
+            '<i class="fa-solid fa-satellite"></i> Satellite Map': satelliteTileLayer
+        };
+        const overlayMaps = {
+            '<i class="fa-solid fa-draw-polygon"></i> Brgy. Boundary Line': barangayBorderPolygon
+        };
+        L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(map);
+
+        const brgyHallIcon = L.divIcon({
+            className: 'custom-brgy-hall-wrapper',
+            html: `<div class="custom-brgy-hall-marker"><i class="fa-solid fa-building-columns"></i></div>`,
+            iconSize: [38, 38], iconAnchor: [19, 19]
+        });
+
+        L.marker(BRGY_HALL_COORDS, { icon: brgyHallIcon }).addTo(map)
+         .bindPopup(`<b><i class="fa-solid fa-building-columns text-success me-1"></i> Barangay Cayanga Hall</b><br>Operations Center`);
+
+        renderMapHouseMarkers();
+    }
+
+    function renderMapHouseMarkers(filterType = "all") {
+        activeMapFilter = filterType;
+        for (const id in leafletMarkers) {
+            map.removeLayer(leafletMarkers[id]);
+        }
+        leafletMarkers = {};
+
+        let displayedCount = 0;
+        const totalCount = Object.keys(prototypeHouseholders).length;
+
+        for (const id in prototypeHouseholders) {
+            const house = prototypeHouseholders[id];
+            const houseId = parseInt(id);
+
+            if (filterType === 'verified' && !house.verified) continue;
+            if (filterType === 'vulnerable' && !house.vulnerable) continue;
+            if (filterType === 'pending' && house.verified) continue;
+
+            displayedCount++;
+
+            let colorClass = "icon-verified";
+            let statusLabel = '<i class="fa-solid fa-circle-check text-success"></i> Verified Standard';
+
+            if (activeEmergencyIds.has(houseId)) {
+                colorClass = "alert-active";
+                statusLabel = '<i class="fa-solid fa-triangle-exclamation text-danger"></i> Emergency SOS';
+            } else if (!house.verified) {
+                colorClass = "icon-pending";
+                statusLabel = '<i class="fa-solid fa-hourglass-half text-warning"></i> Pending Verification';
+            } else if (house.vulnerable) {
+                colorClass = "icon-vulnerable";
+                statusLabel = '<i class="fa-solid fa-universal-access text-primary"></i> Vulnerable (Senior/PWD)';
+            }
+
+            const houseIcon = L.divIcon({
+                className: `custom-house-icon ${colorClass} house-icon-${id}`,
+                html: `<i class="fa-solid fa-house-chimney shadow-sm"></i>`,
+                iconSize: [30, 30], iconAnchor: [15, 15]
+            });
+
+            // Simplified popup label matching upgraded BK Alert System
+            const popupHtml = `
+                <div style="min-width: 150px; text-align: center;">
+                    <b><i class="fa-solid fa-house-chimney text-success me-1"></i> ${escapeHtml(house.name)}</b><br>
+                    <small>Status: ${statusLabel}</small>
+                </div>
+            `;
+
+            const marker = L.marker(house.coords, { icon: houseIcon }).addTo(map);
+            marker.on('click', () => { 
+                selectedEmergencyId = houseId;
+                showHouseData(houseId); 
+                map.panTo(house.coords); 
+            });
+            marker.bindPopup(popupHtml);
+            leafletMarkers[id] = marker;
+        }
+
+        const counterTag = document.getElementById("mapFilteredCount");
+        if (counterTag) {
+            counterTag.innerText = `Showing ${displayedCount} of ${totalCount} Households`;
+        }
+    }
+
+    function filterMapMarkers(filterVal) {
+        renderMapHouseMarkers(filterVal);
+    }
+
+    function recenterMap() {
+        if (map) {
+            map.flyTo(BRGY_HALL_COORDS, 17, { duration: 1.0 });
+        }
+    }
+
+    function resetMapControls() {
+        document.getElementById("mapSmartSearchInput").value = "";
+        document.getElementById("mapMarkerFilter").value = "all";
+        renderMapHouseMarkers("all");
+        recenterMap();
+        document.getElementById("houseInfoPanel").innerHTML = `
+            <p class="text-muted small">Click any house marker on the map or use the Smart Search bar above to inspect family profile.</p>
+        `;
+    }
+
+    function handleMapSearchKey(e) {
+        if (e.key === "Enter") executeMapSearch();
+    }
+
+    function executeMapSearch() {
+        const query = document.getElementById("mapSmartSearchInput").value.trim().toLowerCase();
+        if (!query) return;
+
+        let matchedId = null;
+        for (const id in prototypeHouseholders) {
+            const h = prototypeHouseholders[id];
+            if (h.name.toLowerCase().includes(query) || h.head.toLowerCase().includes(query) || h.members.toLowerCase().includes(query)) {
+                matchedId = id;
+                break;
+            }
+        }
+
+        if (matchedId && leafletMarkers[matchedId]) {
+            const house = prototypeHouseholders[matchedId];
+            map.flyTo(house.coords, 18, { duration: 1.2 });
+            leafletMarkers[matchedId].openPopup();
+            showHouseData(matchedId);
+        } else {
+            document.getElementById("houseInfoPanel").innerHTML = `
+                <div class="alert alert-warning border-warning mb-0 p-3">
+                    <h6 class="fw-bold"><i class="fa-solid fa-house-circle-xmark me-1"></i> No Household Found</h6>
+                    <p class="small mb-2">No active location pin matched query <strong>"${escapeHtml(query)}"</strong>.</p>
+                    <p class="small mb-0 text-muted"><strong>Suggestions:</strong> Try searching by Household Head (e.g., <em>"Datuin"</em>), Household Name, or clear search filter.</p>
+                </div>
+            `;
+        }
+    }
+
+    function showHouseData(id) {
+        const houseId = parseInt(id);
+        const data = prototypeHouseholders[houseId];
+        const isEmergency = activeEmergencyIds.has(houseId);
+
+        let sosActionHtml = ``;
+        if (isEmergency) {
+            sosActionHtml = `
+                <div class="alert alert-danger py-2 mb-2 text-center small fw-bold shadow-sm">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> CRITICAL ALARM ACTIVE
+                </div>
+                <button class="btn btn-sm btn-danger fw-bold w-100 shadow-sm" onclick="clearActiveEmergency(${houseId})">
+                    <i class="fa-solid fa-check-double me-1"></i> Acknowledge & Clear SOS
+                </button>
+            `;
+        } else {
+            sosActionHtml = `
+                <button class="btn btn-sm btn-outline-danger w-100" onclick="triggerHardwareEmergency(${houseId})">
+                    <i class="fa-solid fa-bell me-1"></i> Trigger Direct S.O.S Alert
+                </button>
+            `;
+        }
+
+        document.getElementById("houseInfoPanel").innerHTML = `
+            <h5 class="text-success mb-2">${escapeHtml(data.name)}</h5>
+            <p class="mb-1"><strong>Household ID:</strong> #${id}</p>
+            <p class="mb-1"><strong>Verification Status:</strong> ${data.verified ? '<span class="badge bg-success">Verified</span>' : '<span class="badge bg-warning text-dark">Pending</span>'}</p>
+            <p class="mb-1"><strong>Household Head:</strong> ${escapeHtml(data.head)}</p>
+            <p class="mb-1"><strong>Distance from Brgy. Hall:</strong> ${escapeHtml(data.distance)}</p>
+            <p class="mb-1"><strong>Family Members:</strong> ${data.count} Residents</p>
+            <p class="mb-3 text-muted small"><strong>Notes:</strong> ${escapeHtml(data.notes)}</p>
+
+            <div class="d-grid gap-2 border-top pt-3">
+                <button class="btn btn-sm btn-outline-success" onclick="contactAidPoster('${escapeHtml(data.head)}', '${escapeHtml(data.phone)}')">
+                    <i class="fa-solid fa-phone me-1"></i> Call Household (${escapeHtml(data.phone)})
+                </button>
+                ${sosActionHtml}
+                <button class="btn btn-sm btn-outline-primary" onclick="showSection('vetting')">
+                    <i class="fa-solid fa-folder-open me-1"></i> View Resident File
+                </button>
+            </div>
+        `;
+    }
+
+    /* ==========================================================================
+       RESIDENT VERIFICATION MODULE ENGINE
+       ========================================================================== */
+    const household1Residents = [
+        { id: "VET-1001", name: "Juan Datuin", date: "2026-01-15", purok: "Purok 1 Core Sector", docs: ["Gov_ID_Passport.jpg", "Proof_Of_Address.pdf"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 1 Head - Verified Resident" },
+        { id: "VET-1002", name: "Pacita Datuin", date: "2026-01-15", purok: "Purok 1 Core Sector", docs: ["Gov_ID.jpg"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 1 Member" },
+        { id: "VET-1003", name: "Jarrell Datuin", date: "2026-01-15", purok: "Purok 1 Core Sector", docs: ["Birth_Certificate.pdf"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 1 Member" },
+        { id: "VET-1004", name: "Emily Datuin", date: "2026-01-15", purok: "Purok 1 Core Sector", docs: ["Birth_Certificate.pdf"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 1 Member (Infant)" }
+    ];
+
+    const household2Residents = [
+        { id: "VET-1005", name: "Maria Dela Cruz", date: "2026-01-16", purok: "Purok 2 Mid-Field Sector", docs: ["PWD_ID.jpg", "Proof_Of_Address.pdf"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 2 Head - Wheelchair access profile (PWD)" },
+        { id: "VET-1006", name: "Pedro Dela Cruz", date: "2026-01-16", purok: "Purok 2 Mid-Field Sector", docs: ["UMID_Card.jpg"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 2 Member" },
+        { id: "VET-1007", name: "Teresa Dela Cruz", date: "2026-01-16", purok: "Purok 2 Mid-Field Sector", docs: ["Gov_ID.jpg"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 2 Member" },
+        { id: "VET-1008", name: "Juanito Dela Cruz", date: "2026-01-16", purok: "Purok 2 Mid-Field Sector", docs: ["Student_ID.pdf"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 2 Member" },
+        { id: "VET-1009", name: "Sofia Dela Cruz", date: "2026-01-16", purok: "Purok 2 Mid-Field Sector", docs: ["Birth_Certificate.pdf"], status: "Approved", idPhoto: "nopfp.jpeg", notes: "Household 2 Member" }
+    ];
+
+    const household3Residents = [
+        { id: "VET-1010", name: "Carlos Reyes", date: "Today, 09:30 AM", purok: "Purok 3 Outer Perimeter Sector", docs: ["Senior_ID.jpg", "Barangay_Clearance.pdf"], status: "Pending", idPhoto: "nopfp.jpeg", notes: "Household 3 Head - Senior Citizen residing near Cayanga River" },
+        { id: "VET-1011", name: "Glenda Reyes", date: "Today, 09:35 AM", purok: "Purok 3 Outer Perimeter Sector", docs: ["Gov_ID.jpg"], status: "Pending", idPhoto: "nopfp.jpeg", notes: "Household 3 Member - Pending Verification" },
+        { id: "VET-1012", name: "Mark Reyes", date: "Today, 09:40 AM", purok: "Purok 3 Outer Perimeter Sector", docs: ["Student_ID.pdf"], status: "Pending", idPhoto: "nopfp.jpeg", notes: "Household 3 Member - Pending Verification" }
+    ];
+
+    const rejectedResidents = [
+        { id: "VET-1013", name: "Antonio Santos", date: "Yesterday, 02:15 PM", purok: "Purok 1 Core Sector", docs: ["Expired_Driver_License.jpg"], status: "Rejected", idPhoto: "nopfp.jpeg", notes: "Expired Government ID" },
+        { id: "VET-1014", name: "Beatriz Castro", date: "2 days ago", purok: "Purok 2 Mid-Field Sector", docs: ["Blurry_ID.jpg"], status: "Rejected", idPhoto: "nopfp.jpeg", notes: "Blurry/Unreadable ID Document" },
+        { id: "VET-1015", name: "Fernando Poe", date: "3 days ago", purok: "Purok 3 River Sector", docs: ["Utility_Bill.pdf"], status: "Rejected", idPhoto: "nopfp.jpeg", notes: "Address Discrepancy in Purok" }
+    ];
+
+    const generateDummyVerified = () => {
+        const list = [];
+        const firstNames = ["Jose", "Ana", "Ramon", "Luz", "Francisco", "Rosa", "Manuel", "Corazon", "Gabriel", "Lourdes", "Danilo", "Remedios", "Eduardo", "Josefina", "Antonio", "Teresa", "Mario", "Esperanza", "Rolando", "Imelda", "Arthur", "Gloria", "Reynaldo", "Fe", "Vicente", "Mercy", "Ernesto", "Grace", "Salvador", "Pearl", "Benito", "Daisy", "Fernando", "Ruby", "Gregorio", "Jasmine", "Rodolfo", "Hazel", "Dominador", "Ivy"];
+        const lastNames = ["Bautista", "Aquino", "Ramos", "Garcia", "Mendoza", "Villanueva", "Torres", "Flores", "Castillo", "Gonzales", "Navarro", "Morales", "Mercado", "Valdez", "Aguilar", "Pineda", "Ocampo", "Miranda", "Soriano", "Dizon", "Corpuz", "Manalo", "Santiago", "Perez", "Tolentino"];
+        const puroks = ["Purok 1 Core Sector", "Purok 2 Mid-Field Sector", "Purok 3 River Sector"];
+
+        let count = 0;
+        for (let i = 0; i < firstNames.length && count < 139; i++) {
+            for (let j = 0; j < lastNames.length && count < 139; j++) {
+                count++;
+                const idNum = 1015 + count;
+                list.push({
+                    id: `VET-${idNum}`,
+                    name: `${firstNames[i]} ${lastNames[j]}`,
+                    date: "2026-02-01",
+                    purok: puroks[count % 3],
+                    docs: ["Gov_ID.jpg", "Barangay_Clearance.pdf"],
+                    status: "Approved",
+                    idPhoto: "nopfp.jpeg",
+                    notes: "Verified Resident Record"
+                });
+            }
+        }
+        return list;
+    };
+
+    let vettingRequests = [
+        ...household1Residents,
+        ...household2Residents,
+        ...generateDummyVerified(),
+        ...household3Residents,
+        ...rejectedResidents
+    ];
+
+    let activeInspectId = null;
+
+    function renderVettingQueue() {
+        const tbody = document.getElementById("vettingTableBody");
+        if (!tbody) return;
+
+        const filterStatus = document.getElementById("vettingStatusFilter") ? document.getElementById("vettingStatusFilter").value : "all";
+        const query = document.getElementById("vettingSearchInput") ? document.getElementById("vettingSearchInput").value.toLowerCase() : "";
+
+        tbody.innerHTML = "";
+
+        let pendingCount = 0, approvedCount = 0, rejectedCount = 0;
+
+        vettingRequests.forEach(req => {
+            if (req.status === "Pending" || req.status === "Under Review") pendingCount++;
+            if (req.status === "Approved") approvedCount++;
+            if (req.status === "Rejected") rejectedCount++;
+
+            if (filterStatus !== "all" && req.status !== filterStatus) return;
+            if (query && !req.name.toLowerCase().includes(query) && !req.purok.toLowerCase().includes(query)) return;
+
+            let statusBadge = `<span class="badge bg-warning text-dark"><i class="fa-solid fa-hourglass-half me-1"></i> ${escapeHtml(req.status)}</span>`;
+            if (req.status === "Approved") statusBadge = `<span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> Verified</span>`;
+            if (req.status === "Rejected") statusBadge = `<span class="badge bg-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Rejected</span>`;
+            if (req.status === "Under Review") statusBadge = `<span class="badge bg-info text-dark"><i class="fa-solid fa-magnifying-glass me-1"></i> Under Review</span>`;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${escapeHtml(req.name)}</strong><br><small class="text-muted font-monospace">${escapeHtml(req.id)}</small></td>
+                <td><small class="text-muted">${escapeHtml(req.date)}</small></td>
+                <td>${escapeHtml(req.purok)}</td>
+                <td><span class="badge bg-light text-dark border"><i class="fa-solid fa-file-lines me-1 text-primary"></i> ${req.docs ? req.docs.length : 1} Uploaded</span></td>
+                <td>${statusBadge}</td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary" onclick="openInspectModal('${escapeHtml(req.id)}')">
+                        <i class="fa-solid fa-magnifying-glass-plus me-1"></i> Inspect & Verify
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById("statPendingVetting").innerText = pendingCount;
+        document.getElementById("statApprovedVetting").innerText = approvedCount;
+        document.getElementById("statRejectedVetting").innerText = rejectedCount;
+
+        const totalEvaluated = approvedCount + rejectedCount;
+        const rate = totalEvaluated > 0 ? ((approvedCount / totalEvaluated) * 100).toFixed(1) + "%" : "0.0%";
+        const authRateEl = document.getElementById("statAuthRate");
+        if (authRateEl) authRateEl.innerText = rate;
+    }
+
+    function filterVettingQueue() {
+        renderVettingQueue();
+    }
+
+    function openInspectModal(reqId) {
+        activeInspectId = reqId;
+        const req = vettingRequests.find(r => r.id === reqId);
+        if (!req) return;
+
+        const body = document.getElementById("inspectModalBody");
+        body.innerHTML = `
+            <div class="row g-3">
+                <div class="col-md-5 text-center border-end">
+                    <h6><i class="fa-solid fa-id-card text-success me-1"></i> Submitted ID Document</h6>
+                    <img src="${escapeHtml(req.idPhoto)}" class="id-card-preview mb-2 shadow-sm" alt="ID Document">
+                    <p class="small text-muted mb-0">Attached Files: ${escapeHtml(req.docs ? req.docs.join(", ") : "Gov_ID.jpg")}</p>
+                </div>
+                <div class="col-md-7">
+                    <h5 class="text-success mb-1">${escapeHtml(req.name)}</h5>
+                    <p class="text-muted small mb-3">Ref ID: ${escapeHtml(req.id)} | Submitted: ${escapeHtml(req.date)}</p>
+                    
+                    <p class="mb-1"><strong>Target Purok:</strong> ${escapeHtml(req.purok)}</p>
+                    <p class="mb-2"><strong>Verification Note:</strong> ${escapeHtml(req.notes)}</p>
+                    
+                    <div class="p-3 bg-light rounded border">
+                        <small class="fw-bold text-secondary d-block mb-1">AUTOMATED AUTHENTICATION CHECKLIST:</small>
+                        <div class="form-check form-check-inline small">
+                            <input class="form-check-input" type="checkbox" checked id="chk1">
+                            <label class="form-check-label" for="chk1">Valid Photo ID</label>
+                        </div>
+                        <div class="form-check form-check-inline small">
+                            <input class="form-check-input" type="checkbox" checked id="chk2">
+                            <label class="form-check-label" for="chk2">Cayanga Address Match</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const rr = document.getElementById("rejectionReasonSelect");
+        if (rr) rr.selectedIndex = 0;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('inspectResidentModal')).show();
+    }
+
+    async function processVettingAction(action) {
+        if (!activeInspectId) return;
+        const req = vettingRequests.find(r => r.id === activeInspectId);
+        if (!req) return;
+
+        const reasonSelect = document.getElementById("rejectionReasonSelect");
+        const reason = reasonSelect ? reasonSelect.value : "";
+        
+        if (action === "Rejected" && !reason) {
+            notify("Error: Please select a valid rejection reason from the dropdown before rejecting.");
+            return;
+        }
+
+        if (!(await bkConfirm(`Are you sure you want to mark this resident's verification as ${action}?`, { title: "Confirm verification", confirmText: action, danger: action === "Rejected" }))) {
+            return;
+        }
+
+        req.status = action;
+        renderVettingQueue();
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('inspectResidentModal')).hide();
+
+        addAuditLog("VERIFY", "Resident Verification", `Resident '${req.name}' status set to ${action.toUpperCase()} ${reason ? '(' + reason + ')' : ''}`);
+
+        if (action === "Approved") {
+            serialLogsData.unshift({
+                serial: `BRGY-CLR-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+                type: "Resident Verification Certificate",
+                resident: req.name,
+                date: new Date().toLocaleDateString(),
+                issuer: activeDutyOfficer ? activeDutyOfficer.name : "System Desk",
+                status: "Active"
+            });
+            renderSerialTable();
+        }
+    }
+
+    /* ==========================================================================
+       AUDIT & SERIAL LOGS ENGINE
+       ========================================================================== */
+    let auditLogsData = [
+        { timestamp: "2026-07-22 08:00:12", actor: "Hon. Juan Dela Cruz", action: "LOGIN", module: "Authentication", ip: "192.168.1.101", diff: "Shift Login Started" },
+        { timestamp: "2026-07-22 08:30:00", actor: "Maria Santos", action: "CREATE", module: "Community Alerts", ip: "192.168.1.105", diff: "Created Cayanga River Advisory Notice" }
+    ];
+
+    let serialLogsData = [
+        { serial: "BRGY-CLR-2026-8812", type: "Barangay Clearance ID", resident: "Juan Datuin", date: "2026-07-21", issuer: "Maria Santos", status: "Active" },
+        { serial: "BRGY-RFID-2026-0192", type: "Household RFID Emergency Card", resident: "Maria Dela Cruz", date: "2026-07-20", issuer: "Hon. Juan Dela Cruz", status: "Active" }
+    ];
+
+    function addAuditLog(action, module, details) {
+        const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        const officerName = activeDutyOfficer ? activeDutyOfficer.name : "System Automated";
+        
+        const logEntry = {
+            timestamp: timestamp,
+            actor: officerName,
+            action: action,
+            module: module,
+            ip: "192.168.1.108",
+            diff: details
+        };
+
+        auditLogsData.unshift(logEntry);
+
+        const logContainer = document.getElementById("serialLogStream");
+        if (logContainer) {
+            logContainer.innerHTML += `<span class="text-info">[${timestamp}] [${action}]: ${escapeHtml(details)} (by ${escapeHtml(officerName)})</span><br>`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        renderAuditTable();
+    }
+
+    function renderAuditTable() {
+        const tbody = document.getElementById("auditTrailTableBody");
+        if (!tbody) return;
+
+        const query = document.getElementById("auditSearchInput") ? document.getElementById("auditSearchInput").value.toLowerCase() : "";
+        const actionFilter = document.getElementById("auditActionFilter") ? document.getElementById("auditActionFilter").value : "all";
+
+        tbody.innerHTML = "";
+
+        auditLogsData.forEach((log, index) => {
+            if (actionFilter !== "all" && !log.action.includes(actionFilter)) return;
+            if (query && !log.actor.toLowerCase().includes(query) && !log.module.toLowerCase().includes(query) && !log.diff.toLowerCase().includes(query)) return;
+
+            let badgeClass = "bg-secondary";
+            if (log.action === "LOGIN") badgeClass = "bg-info text-dark";
+            if (log.action === "VERIFY") badgeClass = "bg-primary";
+            if (log.action === "CREATE") badgeClass = "bg-success";
+            if (log.action === "EMERGENCY") badgeClass = "bg-danger";
+            if (log.action === "HARDWARE") badgeClass = "bg-dark";
+            if (log.action === "UPDATE") badgeClass = "bg-warning text-dark";
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><small class="font-monospace text-muted">${escapeHtml(log.timestamp)}</small></td>
+                <td><strong>${escapeHtml(log.actor)}</strong></td>
+                <td><span class="badge ${badgeClass}">${escapeHtml(log.action)}</span></td>
+                <td>${escapeHtml(log.module)}</td>
+                <td><small class="font-monospace text-muted">${escapeHtml(log.ip)}</small></td>
+                <td class="text-end">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="viewAuditDiff(${index})">
+                        <i class="fa-solid fa-code-compare"></i> View Diff
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function viewAuditDiff(index) {
+        const log = auditLogsData[index];
+        if (!log) return;
+        
+        document.getElementById("diffModalContent").innerHTML = `
+            <div class="diff-container">
+                <div class="mb-2"><strong>Action Type:</strong> ${escapeHtml(log.action)}</div>
+                <div class="mb-2"><strong>Module Modified:</strong> ${escapeHtml(log.module)}</div>
+                <div class="diff-new mt-3">
+                    <strong>+ Detailed Changes:</strong><br/>
+                    ${escapeHtml(log.diff)}
+                </div>
+            </div>
+        `;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('diffViewerModal')).show();
+    }
+
+    function renderSerialTable() {
+        const tbody = document.getElementById("serialTrackerTableBody");
+        if (!tbody) return;
+        
+        tbody.innerHTML = "";
+        
+        serialLogsData.forEach(log => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><small class="font-monospace fw-bold">${escapeHtml(log.serial)}</small></td>
+                <td>${escapeHtml(log.type)}</td>
+                <td>${escapeHtml(log.resident)}</td>
+                <td><small>${escapeHtml(log.date)}</small></td>
+                <td>${escapeHtml(log.issuer)}</td>
+                <td><span class="badge bg-success">${escapeHtml(log.status)}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function exportAuditCSV() {
+        const query = document.getElementById("auditSearchInput") ? document.getElementById("auditSearchInput").value.toLowerCase() : "";
+        const actionFilter = document.getElementById("auditActionFilter") ? document.getElementById("auditActionFilter").value : "all";
+
+        const rows = auditLogsData.filter(log => {
+            if (actionFilter !== "all" && !log.action.includes(actionFilter)) return false;
+            if (query && !log.actor.toLowerCase().includes(query) && !log.module.toLowerCase().includes(query) && !log.diff.toLowerCase().includes(query)) return false;
+            return true;
+        });
+
+        if (rows.length === 0) {
+            notify("There are no audit logs to export for the current filter.", "warning");
+            return;
+        }
+
+        const cell = v => {
+            let t = String(v === undefined || v === null ? "" : v);
+            if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+            return '"' + t.replace(/"/g, '""') + '"';
+        };
+        const lines = [["Timestamp", "Officer / Actor", "Action", "Module", "IP Address", "Details"].map(cell).join(",")];
+        rows.forEach(l => lines.push([l.timestamp, l.actor, l.action, l.module, l.ip, l.diff].map(cell).join(",")));
+
+        const blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "BantayKo-audit-logs-" + new Date().toISOString().slice(0, 10) + ".csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+
+        notify(`Audit log CSV downloaded successfully (${rows.length} records).`);
+        addAuditLog("EXPORT", "Audit & Logs", `Exported ${rows.length} audit trail record(s) to CSV file.`);
+    }
+
+    function filterAuditLogs() {
+        renderAuditTable();
+    }
+
+    /* ==========================================================================
+       COMMUNITY ALERTS & MULTI-HOUSEHOLD EMERGENCY PROTOCOLS
+       ========================================================================== */
+    let currentAlertStatusFilter = 'all';
+    let currentAlertSeverityFilter = 'all';
+
+    function triggerHardwareEmergency(id) {
+        const targetId = parseInt(id);
+        activeEmergencyIds.add(targetId);
+        selectedEmergencyId = targetId;
+
+        const house = prototypeHouseholders[targetId] || { name: `Household #${targetId}`, distance: "Unknown" };
+        
+        document.getElementById("globalEmergencyBanner").style.display = "block";
+        document.getElementById("bannerDetails").innerText = `Household Name: ${house.name} | Distance from Brgy. Hall: ${house.distance} (${activeEmergencyIds.size} Active Alarm${activeEmergencyIds.size > 1 ? 's' : ''})`;
+        
+        updateAlertCounts();
+
+        const statusBox = document.getElementById("liveAlertStatusBox");
+        statusBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> ${activeEmergencyIds.size} EMERGENCY ALARM(S) ACTIVE`;
+        statusBox.className = "p-3 bg-danger rounded text-center fw-bold text-white mt-2 shadow-sm";
+        const statusCard = document.getElementById("liveAlertStatusCard");
+        if (statusCard) {
+            statusCard.classList.remove("border-success");
+            statusCard.classList.add("border-danger");
+        }
+
+        addAuditLog("EMERGENCY", "Hardware Trigger", `Direct S.O.S Alert triggered for ${house.name}`);
+        sendArduinoCommand(`ON_${targetId}`);
+
+        if (typeof map !== 'undefined' && map) renderMapHouseMarkers(activeMapFilter);
+        showHouseData(targetId);
+    }
+
+    function clearActiveEmergency(id) {
+        const targetId = id ? parseInt(id) : (selectedEmergencyId || Array.from(activeEmergencyIds)[0]);
+
+        if (targetId && activeEmergencyIds.has(targetId)) {
+            activeEmergencyIds.delete(targetId);
+            sendArduinoCommand(`CLEAR_${targetId}`);
+            const house = prototypeHouseholders[targetId] || { name: `Household #${targetId}` };
+            addAuditLog("UPDATE", "Emergency Response", `Emergency acknowledged and cleared for ${house.name}`);
+        }
+
+        if (activeEmergencyIds.size > 0) {
+            const nextId = Array.from(activeEmergencyIds)[0];
+            selectedEmergencyId = nextId;
+            const nextHouse = prototypeHouseholders[nextId] || { name: `Household #${nextId}`, distance: "Unknown" };
+            document.getElementById("bannerDetails").innerText = `Household Name: ${nextHouse.name} | Distance from Brgy. Hall: ${nextHouse.distance} (${activeEmergencyIds.size} Active Alarm${activeEmergencyIds.size > 1 ? 's' : ''})`;
+            
+            const statusBox = document.getElementById("liveAlertStatusBox");
+            statusBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> ${activeEmergencyIds.size} EMERGENCY ALARM(S) ACTIVE`;
+        } else {
+            selectedEmergencyId = null;
+            document.getElementById("globalEmergencyBanner").style.display = "none";
+            
+            const statusBox = document.getElementById("liveAlertStatusBox");
+            statusBox.innerHTML = '<i class="fa-solid fa-shield-halved me-1"></i> Normal: All Households Secured';
+            statusBox.className = "p-3 bg-light rounded text-center fw-bold text-success mt-2";
+            const statusCard = document.getElementById("liveAlertStatusCard");
+            if (statusCard) {
+                statusCard.classList.remove("border-danger");
+                statusCard.classList.add("border-success");
+            }
+        }
+
+        updateAlertCounts();
+        if (typeof map !== 'undefined' && map) renderMapHouseMarkers(activeMapFilter);
+        if (targetId) showHouseData(targetId);
+    }
+
+    function updateAlertCounts() {
+        const active = document.querySelectorAll("#alertContainer .alert-card.alert-active").length + activeEmergencyIds.size;
+        const resolved = document.querySelectorAll("#alertContainer .alert-card.alert-resolved").length;
+        document.getElementById("activeAlertCountDisplay").innerText = active;
+        document.getElementById("resolvedAlertCountDisplay").innerText = resolved;
+    }
+
+    function buildAlertMenu(status) {
+        if (status === 'resolved') {
+            return `<li><a class="dropdown-item" href="#" onclick="changeAlertStatus(this, 'active'); return false;"><i class="fa-solid fa-rotate-left me-2"></i>Re-open as Active</a></li>`;
+        }
+        return `
+            <li><a class="dropdown-item text-success fw-bold" href="#" onclick="changeAlertStatus(this, 'resolved'); return false;"><i class="fa-solid fa-circle-check me-2"></i>Mark as Resolved</a></li>
+            <li><a class="dropdown-item text-danger" href="#" onclick="escalateAlert(this); return false;"><i class="fa-solid fa-angles-up me-2"></i>Escalate to LGU/MDRRMO</a></li>`;
+    }
+
+    function setAlertCardState(card, status) {
+        const isActive = status === 'active';
+        card.classList.remove('alert-active', 'alert-resolved', 'border-danger', 'border-success', 'border-warning');
+        card.classList.add(isActive ? 'alert-active' : 'alert-resolved', isActive ? 'border-danger' : 'border-success');
+
+        const sevBadge = card.querySelector('.alert-severity-badge');
+        if (sevBadge) {
+            sevBadge.classList.remove('bg-danger', 'bg-success', 'bg-warning', 'text-dark');
+            sevBadge.classList.add(isActive ? 'bg-danger' : 'bg-success');
+        }
+        const statusBadge = card.querySelector('.alert-status-badge');
+        if (statusBadge) {
+            statusBadge.classList.remove('bg-danger', 'bg-success');
+            statusBadge.classList.add(isActive ? 'bg-danger' : 'bg-success');
+            statusBadge.innerHTML = isActive
+                ? '<i class="fa-solid fa-bell me-1"></i> Active'
+                : '<i class="fa-solid fa-circle-check me-1"></i> Resolved';
+        }
+        const menu = card.querySelector('.alert-action-menu');
+        if (menu) menu.innerHTML = buildAlertMenu(status);
+    }
+
+    async function changeAlertStatus(btn, status) {
+        const label = status === 'resolved' ? 'Resolved' : 'Active';
+        if (!(await bkConfirm(`Change this alert status to ${label}?`, { title: "Change alert status" }))) return;
+        const card = btn.closest('.alert-card');
+        if (!card) return;
+        setAlertCardState(card, status);
+        updateAlertCounts();
+        applyAlertFilters();
+        notify(`Alert status successfully updated to ${label}.`);
+        addAuditLog("UPDATE", "Community Alerts", `Alert status modified to ${status.toUpperCase()}`);
+    }
+
+    async function escalateAlert(btn) {
+        if (!(await bkConfirm("Escalate this alert to the LGU / MDRRMO?", { title: "Escalate alert", confirmText: "Escalate", danger: true }))) return;
+        const card = btn.closest('.alert-card');
+        if (card && !card.querySelector('.alert-escalated-badge')) {
+            const badgeRow = card.querySelector('.alert-status-badge');
+            if (badgeRow) badgeRow.insertAdjacentHTML('afterend', ' <span class="badge bg-dark alert-escalated-badge"><i class="fa-solid fa-angles-up me-1"></i> Escalated</span>');
+        }
+        notify("Alert escalated to LGU / MDRRMO.");
+        addAuditLog("UPDATE", "Community Alerts", "Alert escalated to LGU/MDRRMO");
+    }
+
+    function filterAlerts(status, btn) {
+        currentAlertStatusFilter = status;
+        if (btn) {
+            document.querySelectorAll("#alertStatusFilter button").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+        }
+        applyAlertFilters();
+    }
+
+    function filterAlertsBySeverity(val) {
+        currentAlertSeverityFilter = val;
+        applyAlertFilters();
+    }
+
+    function searchAlerts() {
+        applyAlertFilters();
+    }
+
+    function applyAlertFilters() {
+        const query = document.getElementById("alertSearchInput") ? document.getElementById("alertSearchInput").value.toLowerCase() : "";
+        const cards = document.querySelectorAll("#alertContainer .alert-card");
+        
+        cards.forEach(card => {
+            const isStatusMatch = (currentAlertStatusFilter === 'all') || 
+                (currentAlertStatusFilter === 'active' && card.classList.contains('alert-active')) ||
+                (currentAlertStatusFilter === 'resolved' && card.classList.contains('alert-resolved'));
+                
+            const isSeverityMatch = (currentAlertSeverityFilter === 'all') || 
+                (currentAlertSeverityFilter === 'danger' && card.classList.contains('alert-severity-danger')) ||
+                (currentAlertSeverityFilter === 'warning' && card.classList.contains('alert-severity-warning'));
+
+            const textContent = card.innerText.toLowerCase();
+            const isQueryMatch = !query || textContent.includes(query);
+
+            if (isStatusMatch && isSeverityMatch && isQueryMatch) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    async function submitAlertBroadcast() {
+        const title = document.getElementById("alertTitleInput").value.trim();
+        const text = document.getElementById("alertText").value.trim();
+        const type = document.getElementById("alertType").value;
+        const targetPurok = document.getElementById("alertTargetPurok").value;
+
+        if (!title || !text) {
+            notify("Error: Please provide both an alert title and detailed instructions.");
+            return;
+        }
+        if (!type) {
+            notify("Error: Please select a severity classification.");
+            return;
+        }
+        if (!targetPurok) {
+            notify("Error: Please select a target zone / sector.");
+            return;
+        }
+        if (!(await bkConfirm("Broadcast this community alert across the network?", { title: "Broadcast alert", confirmText: "Broadcast" }))) return;
+        
+        const alertContainer = document.getElementById("alertContainer");
+        const isDanger = type === "danger";
+        const icon = isDanger ? "fa-circle-exclamation" : "fa-triangle-exclamation";
+        const severityLabel = isDanger ? "Critical Red" : "Moderate Amber";
+
+        const newCard = document.createElement("div");
+        newCard.className = `card alert-card alert-severity-${type} mb-3 border-start border-4 shadow-sm`;
+        newCard.innerHTML = `
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <div>
+                        <span class="badge alert-severity-badge me-2"><i class="fa-solid ${icon} me-1"></i> ${severityLabel}</span>
+                        <span class="badge alert-status-badge me-2"></span>
+                        <span class="badge bg-secondary"><i class="fa-solid fa-location-dot me-1"></i> Target: ${escapeHtml(targetPurok)}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted font-monospace">Posted: Just Now</small>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-0 px-2" type="button" data-bs-toggle="dropdown">
+                                Action
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end alert-action-menu"></ul>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="mb-1">${escapeHtml(title)}</h5>
+                <p class="mb-0 text-muted">${escapeHtml(text)}</p>
+            </div>
+        `;
+        setAlertCardState(newCard, 'active');
+        alertContainer.prepend(newCard);
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('addAlertModal')).hide();
+        addAuditLog("CREATE", "Community Alerts", `Broadcasted Community Alert: "${title}"`);
+
+        updateAlertCounts();
+        applyAlertFilters();
+        notify("Alert broadcast deployed successfully.");
+        
+        document.getElementById("alertTitleInput").value = "";
+        document.getElementById("alertText").value = "";
+        document.getElementById("alertType").selectedIndex = 0;
+        document.getElementById("alertTargetPurok").selectedIndex = 0;
+    }
+
+    /* ==========================================================================
+       BRGY FEED & MUTUAL AID FUNCTIONS
+       ========================================================================== */
+    let currentFeedStatusFilter = 'all';
+
+    function filterFeed(status, btn) {
+        if (btn) {
+            document.querySelectorAll("#feedStatusFilter button").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+        }
+        currentFeedStatusFilter = status;
+        applyFeedFilters();
+    }
+
+    function applyFeedFilters() {
+        const searchEl = document.getElementById("feedSearchInput");
+        const catEl = document.getElementById("feedCategoryFilter");
+        const query = searchEl ? searchEl.value.trim().toLowerCase() : "";
+        const category = catEl ? catEl.value : "all";
+
+        document.querySelectorAll("#feedContainer .feed-item").forEach(post => {
+            const isStatusMatch = currentFeedStatusFilter === 'all' || post.classList.contains(`feed-${currentFeedStatusFilter}`);
+            const isCategoryMatch = category === 'all' || post.dataset.category === category;
+            const isQueryMatch = !query || post.innerText.toLowerCase().includes(query);
+            post.style.display = (isStatusMatch && isCategoryMatch && isQueryMatch) ? "block" : "none";
+        });
+    }
+
+    const FEED_STATUS_CFG = {
+        pending:   { badge: 'bg-warning text-dark', border: 'border-warning', icon: 'fa-hourglass-half', iconColor: 'text-warning', label: 'Pending' },
+        ongoing:   { badge: 'bg-primary',           border: 'border-primary', icon: 'fa-circle-play',    iconColor: 'text-primary', label: 'Ongoing' },
+        completed: { badge: 'bg-success',           border: 'border-success', icon: 'fa-circle-check',   iconColor: 'text-success', label: 'Completed' }
+    };
+
+    function buildFeedMenu(current) {
+        return Object.keys(FEED_STATUS_CFG)
+            .filter(s => s !== current)
+            .map(s => `<li><a class="dropdown-item" href="#" onclick="changeCardStatus(this, '${s}'); return false;"><i class="fa-solid ${FEED_STATUS_CFG[s].icon} me-2 ${FEED_STATUS_CFG[s].iconColor}"></i>Set to ${FEED_STATUS_CFG[s].label}</a></li>`)
+            .join('');
+    }
+
+    function setFeedCardState(card, status) {
+        const cfg = FEED_STATUS_CFG[status];
+        card.classList.remove('feed-pending', 'feed-ongoing', 'feed-completed', 'border-warning', 'border-primary', 'border-success');
+        card.classList.add(`feed-${status}`, cfg.border);
+        const badge = card.querySelector('.event-status-badge');
+        if (badge) {
+            badge.classList.remove('bg-secondary', 'bg-primary', 'bg-success', 'bg-warning', 'text-dark');
+            badge.classList.add(...cfg.badge.split(' '));
+            badge.innerHTML = `<i class="fa-solid ${cfg.icon} me-1"></i> Event Status: ${cfg.label}`;
+        }
+        const menu = card.querySelector('.feed-status-menu');
+        if (menu) menu.innerHTML = buildFeedMenu(status);
+    }
+
+    async function changeCardStatus(btn, status) {
+        if (!(await bkConfirm(`Change event execution status to ${FEED_STATUS_CFG[status].label}?`, { title: "Change event status" }))) return;
+        const card = btn.closest('.feed-item');
+        if (!card) return;
+        setFeedCardState(card, status);
+        applyFeedFilters();
+        notify(`Event status updated to ${FEED_STATUS_CFG[status].label}.`);
+        addAuditLog("UPDATE", "Brgy. Feed", `Feed event status marked as ${status.toUpperCase()}`);
+    }
+
+    function submitFeedPost() {
+        const title = document.getElementById("feedTitle").value.trim();
+        const category = document.getElementById("feedCategory").value;
+        const status = document.getElementById("feedStatus").value;
+        const time = document.getElementById("feedTime").value.trim() || "Scheduled: Today";
+        const desc = document.getElementById("feedDesc").value.trim();
+
+        if (!title) {
+            notify("Please input a valid post title.");
+            return;
+        }
+        if (!category) {
+            notify("Please select a post category.");
+            return;
+        }
+        if (!status) {
+            notify("Please select an initial event status.");
+            return;
+        }
+
+        const catCfg = {
+            governance:     { badge: "bg-dark",            icon: "fa-landmark",         label: "Governance" },
+            cleanup:        { badge: "bg-success",         icon: "fa-broom",            label: "Cleanup" },
+            health:         { badge: "bg-danger",          icon: "fa-heart-pulse",      label: "Health" },
+            livelihood:     { badge: "bg-warning text-dark", icon: "fa-briefcase",      label: "Livelihood" },
+            sports_culture: { badge: "bg-primary",         icon: "fa-people-group",     label: "Sports & Culture" }
+        }[category];
+        const catBadge = catCfg.badge, catIcon = catCfg.icon, catLabel = catCfg.label;
+
+        const feedContainer = document.getElementById("feedContainer");
+        const newFeed = document.createElement("div");
+        newFeed.className = `card mb-3 feed-item border-start border-4`;
+        newFeed.dataset.category = category;
+        newFeed.innerHTML = `
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <div>
+                        <span class="badge ${catBadge} me-2"><i class="fa-solid ${catIcon} me-1"></i> ${catLabel}</span>
+                        <span class="badge event-status-badge"></span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted">${escapeHtml(time)}</small>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-0 px-2" type="button" data-bs-toggle="dropdown">
+                                Status
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end feed-status-menu"></ul>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="mb-1">${escapeHtml(title)}</h4>
+                <p class="mb-0 text-muted">${escapeHtml(desc)}</p>
+            </div>
+        `;
+        setFeedCardState(newFeed, status);
+        feedContainer.prepend(newFeed);
+        applyFeedFilters();
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('addFeedModal')).hide();
+        addAuditLog("CREATE", "Brgy. Feed", `Created community feed post: "${title}"`);
+        notify("Feed Post successfully published.");
+        
+        document.getElementById("feedTitle").value = "";
+        document.getElementById("feedDesc").value = "";
+        document.getElementById("feedTime").value = "";
+        document.getElementById("feedCategory").selectedIndex = 0;
+        document.getElementById("feedStatus").selectedIndex = 0;
+    }
+
+    let currentAidTypeFilter = 'all';
+    let currentAidCategoryFilter = 'all';
+
+    function filterAid(type, btn) {
+        currentAidTypeFilter = type;
+        if (btn) {
+            document.querySelectorAll("#aidTypeFilter button").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+        }
+        applyAidFilters();
+    }
+
+    function filterAidByCategory(val) {
+        currentAidCategoryFilter = val;
+        applyAidFilters();
+    }
+
+    function searchAidListings() {
+        applyAidFilters();
+    }
+
+    function applyAidFilters() {
+        const query = document.getElementById("aidSearchInput") ? document.getElementById("aidSearchInput").value.toLowerCase() : "";
+        const cards = document.querySelectorAll("#aidContainer .aid-card");
+
+        cards.forEach(card => {
+            const isActiveListing = card.classList.contains('aid-status-active');
+            const isTypeMatch = (currentAidTypeFilter === 'all') ||
+                (currentAidTypeFilter === 'offer' && isActiveListing && card.classList.contains('aid-type-offer')) ||
+                (currentAidTypeFilter === 'request' && isActiveListing && card.classList.contains('aid-type-request')) ||
+                (currentAidTypeFilter === 'fulfilled' && card.classList.contains('aid-status-fulfilled'));
+
+            const isCategoryMatch = (currentAidCategoryFilter === 'all') || card.dataset.category === currentAidCategoryFilter;
+
+            const textContent = card.innerText.toLowerCase();
+            const isQueryMatch = !query || textContent.includes(query);
+
+            if (isTypeMatch && isCategoryMatch && isQueryMatch) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    function buildAidMenu(status) {
+        if (status === 'fulfilled') {
+            return `<li><a class="dropdown-item" href="#" onclick="changeAidStatus(this, 'active'); return false;"><i class="fa-solid fa-rotate-left me-2"></i>Re-open Listing</a></li>`;
+        }
+        return `<li><a class="dropdown-item text-success fw-bold" href="#" onclick="changeAidStatus(this, 'fulfilled'); return false;"><i class="fa-solid fa-circle-check me-2"></i>Mark as Fulfilled</a></li>`;
+    }
+
+    function setAidCardState(col, status) {
+        const isOffer = col.classList.contains('aid-type-offer');
+        const fulfilled = status === 'fulfilled';
+        col.classList.remove('aid-status-active', 'aid-status-fulfilled');
+        col.classList.add(`aid-status-${status}`);
+
+        const inner = col.querySelector('.card');
+        if (inner) {
+            inner.classList.remove('border-primary', 'border-danger', 'border-success');
+            inner.classList.add(fulfilled ? 'border-success' : (isOffer ? 'border-primary' : 'border-danger'));
+        }
+        const typeBadge = col.querySelector('.aid-type-badge');
+        if (typeBadge) {
+            typeBadge.classList.remove('bg-primary', 'bg-danger', 'bg-success');
+            typeBadge.classList.add(fulfilled ? 'bg-success' : (isOffer ? 'bg-primary' : 'bg-danger'));
+        }
+        const statusBadge = col.querySelector('.aid-status-badge');
+        if (statusBadge) statusBadge.style.display = fulfilled ? 'inline-block' : 'none';
+        const menu = col.querySelector('.aid-action-menu');
+        if (menu) menu.innerHTML = buildAidMenu(status);
+    }
+
+    async function changeAidStatus(btn, status) {
+        const label = status === 'fulfilled' ? 'Fulfilled' : 'Open';
+        if (!(await bkConfirm(`Mark aid listing as ${label}?`, { title: "Update listing" }))) return;
+        const card = btn.closest('.aid-card');
+        if (!card) return;
+        setAidCardState(card, status);
+        addAuditLog("UPDATE", "Mutual Aid", `Listing status changed to ${status.toUpperCase()}`);
+        applyAidFilters();
+        notify(`Listing marked as ${label}.`);
+    }
+
+    function submitAidListing() {
+        const title = document.getElementById("aidTitle").value.trim();
+        const desc = document.getElementById("aidDesc").value.trim();
+        const type = document.getElementById("aidType").value;
+        const category = document.getElementById("aidCategory").value;
+        const purok = document.getElementById("aidTargetPurok").value;
+        const contact = document.getElementById("aidContact").value.trim() || "Resident Contact";
+
+        if (!title || !desc) {
+            notify("Please fill in both the listing title and description.");
+            return;
+        }
+        if (!type) {
+            notify("Please select a listing type.");
+            return;
+        }
+        if (!category) {
+            notify("Please select a resource category.");
+            return;
+        }
+        if (!purok) {
+            notify("Please select a target zone / sector.");
+            return;
+        }
+
+        const aidContainer = document.getElementById("aidContainer");
+        const isOffer = type === "offer";
+        const typeLabel = isOffer ? "Supply Offer" : "Assistance Request";
+        const icon = isOffer ? "fa-hand-holding-heart" : "fa-hands-praying";
+
+        const newCol = document.createElement("div");
+        newCol.className = `col-md-6 mb-3 aid-card aid-type-${type} aid-status-active`;
+        newCol.dataset.category = category;
+
+        newCol.innerHTML = `
+            <div class="card h-100 border-start border-4 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-1">
+                        <div>
+                            <span class="badge aid-type-badge me-1"><i class="fa-solid ${icon} me-1"></i> ${typeLabel}</span>
+                            <span class="badge bg-success aid-status-badge me-1" style="display:none;"><i class="fa-solid fa-circle-check me-1"></i> Fulfilled</span>
+                            <span class="badge bg-light text-dark border me-1">${escapeHtml(category)}</span>
+                            <span class="badge bg-secondary"><i class="fa-solid fa-location-dot me-1"></i> ${escapeHtml(purok)}</span>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-0 px-2" type="button" data-bs-toggle="dropdown">Action</button>
+                            <ul class="dropdown-menu dropdown-menu-end aid-action-menu"></ul>
+                        </div>
+                    </div>
+                    <h5 class="mb-1 fw-bold">${escapeHtml(title)}</h5>
+                    <p class="text-muted small mb-2">${escapeHtml(desc)}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                        <small class="text-success fw-semibold"><i class="fa-solid fa-user me-1"></i> ${escapeHtml(contact)}</small>
+                        <small class="text-muted font-monospace">Posted: Just Now</small>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        setAidCardState(newCol, 'active');
+        aidContainer.prepend(newCol);
+        applyAidFilters();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('addAidModal')).hide();
+        addAuditLog("CREATE", "Mutual Aid", `Posted aid listing: "${title}"`);
+
+        document.getElementById("aidTitle").value = "";
+        document.getElementById("aidDesc").value = "";
+        document.getElementById("aidContact").value = "";
+        document.getElementById("aidType").selectedIndex = 0;
+        document.getElementById("aidCategory").selectedIndex = 0;
+        document.getElementById("aidTargetPurok").selectedIndex = 0;
+    }
+
+    function contactAidPoster(name, phone) {
+        notify(`Contacting ${name} at ${phone}`);
+    }
+
+    /* ==========================================================================
+       WEB SERIAL API & TARGETED ARDUINO HARDWARE INTEGRATION
+       ========================================================================== */
+    let port = null;
+    let reader = null;
+
+    async function connectArduino() {
+        if (!('serial' in navigator)) {
+            notify("Web Serial API is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+            return;
+        }
+
+        try {
+            port = await navigator.serial.requestPort();
+            await port.open({ baudRate: 9600 });
+
+            const statusBadge = document.getElementById("arduinoStatusBadge");
+            if (statusBadge) {
+                statusBadge.className = "badge bg-success";
+                statusBadge.innerHTML = '<i class="fa-solid fa-plug-circle-check me-1"></i> Arduino Online';
+            }
+
+            addAuditLog("HARDWARE", "Serial Connection", "Web Serial hardware port connected at 9600 baud.");
+            readSerialData();
+
+        } catch (err) {
+            console.error("Serial Connection Error:", err);
+            notify("Failed to connect to Serial Device: " + err.message);
+        }
+    }
+
+    async function readSerialData() {
+        const textDecoder = new TextDecoderStream();
+        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+        reader = textDecoder.readable.getReader();
+
+        let streamBuffer = "";
+
+        try {
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                    reader.releaseLock();
+                    break;
+                }
+                if (value) {
+                    streamBuffer += value;
+                    let lines = streamBuffer.split("\n");
+                    streamBuffer = lines.pop();
+
+                    for (let rawData of lines) {
+                        let incomingSignal = rawData.trim();
+
+                        if (incomingSignal === "H1_SOS") {
+                            triggerHardwareEmergency(1);
+                        } else if (incomingSignal === "H2_SOS") {
+                            triggerHardwareEmergency(2);
+                        } else if (incomingSignal === "H3_SOS") {
+                            triggerHardwareEmergency(3);
+                        }
+
+                        if (incomingSignal.length > 0) {
+                            addAuditLog("HARDWARE", "Serial Stream", `Received Signal: ${incomingSignal}`);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error reading serial stream:", error);
+            addAuditLog("HARDWARE", "Serial Stream Error", error.message);
+        }
+    }
+
+    async function sendArduinoCommand(commandString) {
+        if (port && port.writable) {
+            const encoder = new TextEncoder();
+            const writer = port.writable.getWriter();
+            await writer.write(encoder.encode(commandString + "\n"));
+            writer.releaseLock();
+            addAuditLog("HARDWARE", "Serial Command Sent", `Sent to device: ${commandString}`);
+        }
+    }
+</script>
+
+<!-- ==========================================================================
+     BANTAYKO SQL DATABASE CONNECTOR
+     ========================================================================== -->
+<div id="bkDbChip" style="display:none;position:fixed;right:14px;bottom:14px;z-index:2500;background:#fff;border:1px solid #f1aeb5;border-radius:30px;box-shadow:0 6px 20px rgba(120,20,30,.2);padding:7px 14px;font-size:12px;align-items:center;gap:8px;max-width:calc(100vw - 28px);">
+    <span id="bkDbDot" style="width:9px;height:9px;border-radius:50%;background:#dc3545;display:inline-block;"></span>
+    <span id="bkDbText" style="font-weight:600;color:#b02a37;">SQL database connecting...</span>
+</div>
+
+<script>
+const bkDb = (function () {
+    const API = location.protocol === "file:" ? "http://localhost:3000" : "";
+    let connected = false;
+    let warnedOffline = false;
+
+    const $ = id => document.getElementById(id);
+    const officer = () => (typeof activeDutyOfficer !== "undefined" && activeDutyOfficer) ? activeDutyOfficer.name : "System Automated";
+
+    async function api(method, path, body) {
+        const res = await fetch(API + path, {
+            method,
+            headers: body !== undefined ? { "Content-Type": "application/json" } : {},
+            body: body !== undefined ? JSON.stringify(body) : undefined
+        });
+        if (!res.ok) {
+            let msg = res.statusText;
+            try { msg = (await res.json()).error || msg; } catch (e) {}
+            throw new Error(msg);
+        }
+        return res.json();
+    }
+
+    async function save(method, path, body) {
+        if (!connected) return null;
+        try {
+            const r = await api(method, path, body);
+            refreshCount();
+            return r;
+        } catch (err) {
+            console.error("Database save failed:", path, err);
+            setStatus(false, "SQL server offline - NOT saving. Start server.js and reload.");
+            if (!warnedOffline) { warnedOffline = true; notify("Error: The SQL database server stopped. New changes are not being saved. Start start.bat again and reload the page.", "danger"); }
+            return null;
+        }
+    }
+
+    function setStatus(ok, text) {
+        const chip = $("bkDbChip"), txt = $("bkDbText");
+        if (chip) chip.style.display = ok ? "none" : "flex";
+        if (txt) txt.textContent = text;
+        const d2 = $("bkToolsDot"), t2 = $("bkToolsStatus");
+        if (d2) d2.style.background = ok ? "#198754" : "#dc3545";
+        if (t2) t2.textContent = text;
+    }
+
+    let countTimer = null;
+    function refreshCount() {
+        clearTimeout(countTimer);
+        countTimer = setTimeout(async () => {
+            try {
+                const h = await api("GET", "/api/health");
+                setStatus(true, "SQL database connected \u00b7 " + h.counts.total + " records");
+                renderTools(h.counts);
+            } catch (e) {}
+        }, 250);
+    }
+
+    function postedText(iso) { try { return new Date(iso).toLocaleString(); } catch (e) { return iso; } }
+
+    function buildAlertCard(a) {
+        const isDanger = a.severity === "danger";
+        const icon = isDanger ? "fa-circle-exclamation" : "fa-triangle-exclamation";
+        const label = isDanger ? "Critical Red" : "Moderate Amber";
+        const card = document.createElement("div");
+        card.className = `card alert-card alert-severity-${a.severity} mb-3 border-start border-4 shadow-sm`;
+        card.dataset.rid = a.id;
+        card.innerHTML = `
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <div>
+                        <span class="badge alert-severity-badge me-2"><i class="fa-solid ${icon} me-1"></i> ${label}</span>
+                        <span class="badge alert-status-badge me-2"></span>
+                        <span class="badge bg-secondary"><i class="fa-solid fa-location-dot me-1"></i> Target: ${escapeHtml(a.target_zone)}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted font-monospace">Posted: ${escapeHtml(postedText(a.created_at))}</small>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-0 px-2" type="button" data-bs-toggle="dropdown">Action</button>
+                            <ul class="dropdown-menu dropdown-menu-end alert-action-menu"></ul>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="mb-1">${escapeHtml(a.title)}</h5>
+                <p class="mb-0 text-muted">${escapeHtml(a.message)}</p>
+            </div>`;
+        setAlertCardState(card, a.status);
+        if (a.escalated) {
+            const b = card.querySelector(".alert-status-badge");
+            if (b) b.insertAdjacentHTML("afterend", ' <span class="badge bg-dark alert-escalated-badge"><i class="fa-solid fa-angles-up me-1"></i> Escalated</span>');
+        }
+        return card;
+    }
+
+    const FEED_CATS = {
+        governance:     { badge: "bg-dark",              icon: "fa-landmark",     label: "Governance" },
+        cleanup:        { badge: "bg-success",           icon: "fa-broom",        label: "Cleanup" },
+        health:         { badge: "bg-danger",            icon: "fa-heart-pulse",  label: "Health" },
+        livelihood:     { badge: "bg-warning text-dark", icon: "fa-briefcase",    label: "Livelihood" },
+        sports_culture: { badge: "bg-primary",           icon: "fa-people-group", label: "Sports & Culture" }
+    };
+
+    function buildFeedCard(p) {
+        const cfg = FEED_CATS[p.category] || FEED_CATS.governance;
+        const card = document.createElement("div");
+        card.className = "card mb-3 feed-item border-start border-4";
+        card.dataset.category = p.category;
+        card.dataset.rid = p.id;
+        card.innerHTML = `
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <div>
+                        <span class="badge ${cfg.badge} me-2"><i class="fa-solid ${cfg.icon} me-1"></i> ${cfg.label}</span>
+                        <span class="badge event-status-badge"></span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted">${escapeHtml(p.time_label || "Scheduled: Today")}</small>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-0 px-2" type="button" data-bs-toggle="dropdown">Status</button>
+                            <ul class="dropdown-menu dropdown-menu-end feed-status-menu"></ul>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="mb-1">${escapeHtml(p.title)}</h4>
+                <p class="mb-0 text-muted">${escapeHtml(p.description || "")}</p>
+            </div>`;
+        setFeedCardState(card, p.event_status);
+        return card;
+    }
+
+    function buildAidCard(a) {
+        const isOffer = a.type === "offer";
+        const typeLabel = isOffer ? "Supply Offer" : "Assistance Request";
+        const icon = isOffer ? "fa-hand-holding-heart" : "fa-hands-praying";
+        const col = document.createElement("div");
+        col.className = `col-md-6 mb-3 aid-card aid-type-${a.type} aid-status-active`;
+        col.dataset.category = a.category;
+        col.dataset.rid = a.id;
+        col.innerHTML = `
+            <div class="card h-100 border-start border-4 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-1">
+                        <div>
+                            <span class="badge aid-type-badge me-1"><i class="fa-solid ${icon} me-1"></i> ${typeLabel}</span>
+                            <span class="badge bg-success aid-status-badge me-1" style="display:none;"><i class="fa-solid fa-circle-check me-1"></i> Fulfilled</span>
+                            <span class="badge bg-light text-dark border me-1">${escapeHtml(a.category)}</span>
+                            <span class="badge bg-secondary"><i class="fa-solid fa-location-dot me-1"></i> ${escapeHtml(a.target_zone)}</span>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-0 px-2" type="button" data-bs-toggle="dropdown">Action</button>
+                            <ul class="dropdown-menu dropdown-menu-end aid-action-menu"></ul>
+                        </div>
+                    </div>
+                    <h5 class="mb-1 fw-bold">${escapeHtml(a.title)}</h5>
+                    <p class="text-muted small mb-2">${escapeHtml(a.description)}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                        <small class="text-success fw-semibold"><i class="fa-solid fa-user me-1"></i> ${escapeHtml(a.contact || "Resident Contact")}</small>
+                        <small class="text-muted font-monospace">Posted: ${escapeHtml(postedText(a.created_at))}</small>
+                    </div>
+                </div>
+            </div>`;
+        setAidCardState(col, a.status);
+        return col;
+    }
+
+    function installHooks() {
+        const _audit = window.addAuditLog;
+        window.addAuditLog = function (action, module, details) {
+            _audit(action, module, details);
+            const e = auditLogsData[0];
+            if (e) save("POST", "/api/audit", e);
+        };
+
+        const _vet = window.processVettingAction;
+        window.processVettingAction = async function (action) {
+            const req = vettingRequests.find(r => r.id === activeInspectId);
+            const before = req ? req.status : null;
+            await _vet(action);
+            if (req && req.status !== before) await save("PUT", "/api/vetting/" + encodeURIComponent(req.id), { status: req.status });
+            const s = serialLogsData[0];
+            if (s && !s._saved) { s._saved = true; await save("POST", "/api/serial", s); }
+        };
+
+        const _trig = window.triggerHardwareEmergency;
+        window.triggerHardwareEmergency = function (id) {
+            _trig(id);
+            const house = prototypeHouseholders[id];
+            save("POST", "/api/emergencies", { house: parseInt(id), name: house ? house.name : "Household #" + id, handled_by: officer() });
+        };
+        const _clear = window.clearActiveEmergency;
+        window.clearActiveEmergency = function (id) {
+            _clear(id);
+            save("POST", "/api/emergencies/clear-active", { house: id, cleared_by: officer() });
+        };
+
+        const _subAlert = window.submitAlertBroadcast;
+        window.submitAlertBroadcast = async function () {
+            const c = $("alertContainer"), prev = c.firstElementChild;
+            const f = { title: $("alertTitleInput").value.trim(), message: $("alertText").value.trim(),
+                        severity: $("alertType").value, target_zone: $("alertTargetPurok").value, created_by: officer() };
+            await _subAlert();
+            const card = c.firstElementChild;
+            if (card && card !== prev) { const r = await save("POST", "/api/alerts", f); if (r) card.dataset.rid = r.id; }
+        };
+        const syncAlert = card => {
+            if (!card || !card.dataset.rid) return;
+            save("PUT", "/api/alerts/" + card.dataset.rid, {
+                status: card.classList.contains("alert-active") ? "active" : "resolved",
+                escalated: !!card.querySelector(".alert-escalated-badge")
+            });
+        };
+        const _chAlert = window.changeAlertStatus;
+        window.changeAlertStatus = async function (btn, status) { const card = btn.closest(".alert-card"); await _chAlert(btn, status); syncAlert(card); };
+        const _esc = window.escalateAlert;
+        window.escalateAlert = async function (btn) { const card = btn.closest(".alert-card"); await _esc(btn); syncAlert(card); };
+
+        const _subFeed = window.submitFeedPost;
+        window.submitFeedPost = function () {
+            const c = $("feedContainer"), prev = c.firstElementChild;
+            const f = { title: $("feedTitle").value.trim(), category: $("feedCategory").value, event_status: $("feedStatus").value,
+                        time_label: $("feedTime").value.trim() || "Scheduled: Today", description: $("feedDesc").value.trim(), created_by: officer() };
+            _subFeed();
+            const card = c.firstElementChild;
+            if (card && card !== prev) save("POST", "/api/feed", f).then(r => { if (r) card.dataset.rid = r.id; });
+        };
+        const _chFeed = window.changeCardStatus;
+        window.changeCardStatus = async function (btn, status) {
+            const card = btn.closest(".feed-item");
+            await _chFeed(btn, status);
+            if (card && card.dataset.rid) {
+                const st = ["pending", "ongoing", "completed"].find(s => card.classList.contains("feed-" + s));
+                if (st) save("PUT", "/api/feed/" + card.dataset.rid, { event_status: st });
+            }
+        };
+
+        const _subAid = window.submitAidListing;
+        window.submitAidListing = function () {
+            const c = $("aidContainer"), prev = c.firstElementChild;
+            const f = { title: $("aidTitle").value.trim(), description: $("aidDesc").value.trim(), type: $("aidType").value,
+                        category: $("aidCategory").value, target_zone: $("aidTargetPurok").value,
+                        contact: $("aidContact").value.trim() || "Resident Contact", created_by: officer() };
+            _subAid();
+            const card = c.firstElementChild;
+            if (card && card !== prev) save("POST", "/api/aid", f).then(r => { if (r) card.dataset.rid = r.id; });
+        };
+        const _chAid = window.changeAidStatus;
+        window.changeAidStatus = async function (btn, status) {
+            const card = btn.closest(".aid-card");
+            await _chAid(btn, status);
+            if (card && card.dataset.rid) save("PUT", "/api/aid/" + card.dataset.rid, { status: card.classList.contains("aid-status-fulfilled") ? "fulfilled" : "active" });
+        };
+    }
+
+    async function loadAll() {
+        const st = await api("GET", "/api/state");
+
+        if (!st.initialized) {
+            serialLogsData.forEach(s => s._saved = true);
+            await api("POST", "/api/seed", { audit: auditLogsData, serial: serialLogsData, vetting: vettingRequests });
+            return;
+        }
+
+        applyState(st);
+    }
+
+    function applyState(st) {
+        auditLogsData.splice(0, auditLogsData.length, ...st.audit);
+        serialLogsData.splice(0, serialLogsData.length, ...st.serial.map(s => Object.assign(s, { _saved: true })));
+        
+        if (st.vetting && st.vetting.length > 0) {
+            vettingRequests.splice(0, vettingRequests.length, ...st.vetting);
+        }
+
+        const ac = $("alertContainer"), fc = $("feedContainer"), dc = $("aidContainer");
+        ac.innerHTML = ""; fc.innerHTML = ""; dc.innerHTML = "";
+        st.alerts.forEach(a => ac.appendChild(buildAlertCard(a)));
+        st.feed.forEach(p => fc.appendChild(buildFeedCard(p)));
+        st.aid.forEach(a => dc.appendChild(buildAidCard(a)));
+
+        const banner = $("globalEmergencyBanner"), box = $("liveAlertStatusBox"), card = $("liveAlertStatusCard");
+        
+        activeEmergencyIds.clear();
+        if (st.active_emergencies && st.active_emergencies.length > 0) {
+            st.active_emergencies.forEach(e => activeEmergencyIds.add(parseInt(e.house)));
+            selectedEmergencyId = Array.from(activeEmergencyIds)[0];
+        } else if (st.active_emergency) {
+            activeEmergencyIds.add(parseInt(st.active_emergency.house));
+            selectedEmergencyId = parseInt(st.active_emergency.house);
+        }
+
+        if (activeEmergencyIds.size > 0) {
+            const currentHouse = prototypeHouseholders[selectedEmergencyId] || { name: `Household #${selectedEmergencyId}`, distance: "Unknown" };
+            banner.style.display = "block";
+            $("bannerDetails").innerText = `Household Name: ${currentHouse.name} | Distance from Brgy. Hall: ${currentHouse.distance} (${activeEmergencyIds.size} Active Alarm${activeEmergencyIds.size > 1 ? 's' : ''})`;
+            box.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> ${activeEmergencyIds.size} EMERGENCY ALARM(S) ACTIVE`;
+            box.className = "p-3 bg-danger rounded text-center fw-bold text-white mt-2 shadow-sm";
+            if (card) { card.classList.remove("border-success"); card.classList.add("border-danger"); }
+        } else {
+            selectedEmergencyId = null;
+            banner.style.display = "none";
+            box.innerHTML = '<i class="fa-solid fa-shield-halved me-1"></i> Normal: All Households Secured';
+            box.className = "p-3 bg-light rounded text-center fw-bold text-success mt-2";
+            if (card) { card.classList.remove("border-danger"); card.classList.add("border-success"); }
+        }
+
+        applyAlertFilters(); applyFeedFilters(); applyAidFilters(); updateAlertCounts();
+        renderAuditTable(); renderSerialTable(); renderVettingQueue();
+        if (typeof map !== "undefined" && map) renderMapHouseMarkers(activeMapFilter);
+    }
+
+    async function refreshFromServer() {
+        applyState(await api("GET", "/api/state"));
+        refreshCount();
+    }
+
+    function exportBackup() {
+        if (!connected) return notify("Error: SQL server is not connected.", "danger");
+        const a = document.createElement("a");
+        a.href = API + "/api/export";
+        a.download = "BantayKo-backup.json";
+        document.body.appendChild(a); a.click(); a.remove();
+        notify("Backup file downloaded successfully.");
+    }
+
+    async function importBackup(file) {
+        if (!file || !connected) return;
+        try {
+            const data = JSON.parse(await file.text());
+            if (!(await bkConfirm("This will replace everything in the SQL database with the backup file. Continue?", { title: "Restore backup", confirmText: "Restore", danger: true }))) return;
+            await api("POST", "/api/import", data);
+            await refreshFromServer();
+            notify("Backup restored successfully.");
+        } catch (err) {
+            notify("Error: Could not restore backup. " + err.message, "danger");
+        }
+    }
+
+    async function resetAll() {
+        if (!connected) return;
+        if (!(await bkConfirm("Clear ALL saved records (audit logs, certificates, verifications, alerts, feed, aid, emergencies)? The tables stay, but all their records are emptied. This cannot be undone.", { title: "Clear database", confirmText: "Clear everything", danger: true }))) return;
+        try {
+            await api("POST", "/api/reset");
+            await refreshFromServer();
+            notify("All records cleared successfully.");
+        } catch (err) { notify("Error: Could not clear the database. " + err.message, "danger"); }
+    }
+
+    const TABLE_INFO = [
+        ["audit_logs", "Audit trail (logins, actions, Arduino signals)"],
+        ["serial_logs", "Certificates and serial numbers"],
+        ["vetting_requests", "Resident verification requests"],
+        ["emergencies", "SOS emergencies"],
+        ["community_alerts", "Community alerts"],
+        ["feed_posts", "Brgy. feed posts"],
+        ["aid_listings", "Mutual aid listings"]
+    ];
+
+    function renderTools(counts) {
+        const body = $("bkToolsBody");
+        if (!body || !counts) return;
+        body.innerHTML = TABLE_INFO.map(([t, label]) => `
+            <tr>
+                <td>${escapeHtml(label)}</td>
+                <td><span class="font-monospace small">${t}</span></td>
+                <td class="text-end"><strong>${counts[t] ?? 0}</strong></td>
+                <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger py-0" onclick="bkDb.clearTable('${t}')"><i class="fa-solid fa-trash-can me-1"></i>Clear</button></td>
+            </tr>`).join("");
+    }
+
+    async function clearTable(t) {
+        if (!connected) return;
+        const info = TABLE_INFO.find(x => x[0] === t);
+        if (!info) return;
+        if (!(await bkConfirm(`Clear ALL records in "${info[1]}"? The table stays, but its records are emptied. This cannot be undone.`, { title: "Clear table", confirmText: "Clear all", danger: true }))) return;
+        try {
+            await api("POST", "/api/clear/" + t, {});
+            await refreshFromServer();
+            notify(`"${info[1]}" cleared successfully.`);
+        }
+        catch (err) { notify("Error: Could not clear the table. " + err.message, "danger"); }
+    }
+
+    const _showSection = window.showSection;
+    window.showSection = function (pageId) {
+        _showSection(pageId);
+        if (pageId === "dbtools" && connected) refreshCount();
+    };
+
+    (async function init() {
+        try {
+            await loadAll();
+            connected = true;
+            installHooks();
+            refreshCount();
+        } catch (err) {
+            console.error("SQL database not reachable:", err);
+            connected = false;
+            setStatus(false, "SQL server offline - NOT saving. Run start.bat, then reload.");
+        }
+    })();
+
+    return { exportBackup, importBackup, resetAll, clearTable };
+})();
+</script>
+
+</body>
+</html>
